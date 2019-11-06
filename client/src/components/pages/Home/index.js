@@ -3,7 +3,7 @@ import { Row, Col, Button  } from 'reactstrap';
 import moment from "moment";
 import API from '../../../utils/API';
 import TextCard from '../../parts/TextCard';
-import CustomerSignUp from '../../parts/SignUp/CustomerSignUp';
+import UserSignUp from '../../parts/SignUp/UserSignUp';
 import SweetAlert from 'react-bootstrap-sweetalert';
 import EditUser from '../../parts/Models/EditUser';
 const mailformat = /^\w+([\.-]?\w+)*@\w+([\.-]?\w+)*(\.\w{2,3})+$/;
@@ -19,8 +19,8 @@ class Home extends Component{
             userPool: [],
 
             // Add user form
-            addFirstName: "",
-            addLastName: "",
+            addName: "",
+            addUsername: "",
             addEmail: "",
             addPassword: "",
             addPhoneNum: 0,
@@ -31,8 +31,8 @@ class Home extends Component{
             text: null,
 
             // Update user info form
-            updateFirstName: "",
-            updateLastName: "",
+            updateName: "",
+            updateUsername: "",
             updateEmail: "",
             updatePassword: "",
             updatePhoneNum: "",
@@ -79,8 +79,8 @@ class Home extends Component{
         if(this.validateEmailInput(s.addEmail));
         else return;
         if (
-            !s.addFirstName ||
-            !s.addLastName ||
+            !s.addName ||
+            !s.addUsername ||
             !s.addEmail ||
             !s.addPassword ||
             !s.addPhoneNum
@@ -96,8 +96,8 @@ class Home extends Component{
 
         // Sends info of to util api call
         API.addUser({
-            first_name: s.addFirstName,
-            last_name: s.addLastName,
+            name: s.addName,
+            username: s.addUsername,
             email: s.addEmail,
             password: s.addPassword,
             phone_num: s.addPhoneNum,
@@ -105,8 +105,9 @@ class Home extends Component{
         })
         .catch(err=>console.error("You hit an error: ",err))
         .then(res => {
-            console.log("Add user res:", res.data);
-            window.location.reload(false);
+            console.log("Add user res:", res);
+            // Comment back in for deployment but comment out for testing inputs
+            // window.location.reload(false);
         })
     };
 
@@ -133,8 +134,8 @@ class Home extends Component{
     // Sweet alert model that contains form for PUT operations 
     editUserModal = user => {
         this.setState({ 
-            updateFirstName: user.first_name,
-            updateLastName: user.last_name,
+            updateName: user.name,
+            updateUserame: user.username,
             updateEmail: user.email,
             updatePassword: user.password,
             updatePhoneNum: user.phone_num
@@ -165,8 +166,8 @@ class Home extends Component{
         else return;
         // If one of the form fields has no value block submit
         if (
-          !s.updateFirstName ||
-          !s.updateLastName ||
+          !s.updateName ||
+          !s.updateUsername ||
           !s.updateEmail ||
           !s.updatePassword ||
           !s.updatePhoneNum
@@ -181,8 +182,8 @@ class Home extends Component{
         }
         // Send field info to db using utils api call
         API.updateUser(id, {
-            first_name: s.updateFirstName,
-            last_name: s.updateLastName,
+            name: s.updateName,
+            username: s.updateUsername,
             email: s.updateEmail,
             password: s.updatePassword,
             phone_num: s.updatePhoneNum,
@@ -225,7 +226,7 @@ class Home extends Component{
                                 </Button>
                                 {/* Sign up component holds the actual form inside of another component files kept nested to 
                                     help with organization  */}
-                                <CustomerSignUp 
+                                <UserSignUp 
                                     handleInputChange={this.handleInputChange}
                                     handleFormSubmit={this.signUpUser}
                                 />
@@ -242,8 +243,8 @@ class Home extends Component{
                                     return(
                                         <TextCard
                                         key={user._id}
-                                        title={user.first_name}
-                                        subtitle={user.last_name}
+                                        title={`Name: ${user.name}`}
+                                        subtitle={`Username: ${user.username}`}
                                         >
                                             {/* Show other user information as children */}
                                             <span><h6>Phone number:</h6> <p>{user.phone_num}</p></span>

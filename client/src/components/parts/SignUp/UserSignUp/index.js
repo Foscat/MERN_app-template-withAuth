@@ -1,13 +1,13 @@
 import React from 'react';
 import Flextron from "../../FlexTron";
 import TextCard from "../../TextCard";
-import CustomerSignUpForm from './CustomerSignUpForm';
+import UserSignUpForm from './UserSignUpForm';
 
 // Basic signup component that holds its specific form inside it
 // Gives simple interface for adding users to db
 // Rinse and repeat for new tables in db.
 
-const CustomerSignUp = (props) => {
+const UserSignUp = (props) => {
     
     return(
         <div className={props.className} >
@@ -22,7 +22,7 @@ const CustomerSignUp = (props) => {
                         subtitle="Fill out info and sign up"
                         style={{backgroundColor:"#fff"}}
                     >
-                        <CustomerSignUpForm 
+                        <UserSignUpForm 
                             handleInputChange={props.handleInputChange}
                             handleFormSubmit={props.handleFormSubmit}
                         />
@@ -33,4 +33,4 @@ const CustomerSignUp = (props) => {
     )
 }
 
-export default CustomerSignUp;
+export default UserSignUp;
