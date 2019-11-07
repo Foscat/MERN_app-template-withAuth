@@ -1,11 +1,16 @@
-var bcrypt = require('bcrypt');
+const bcrypt = require('bcrypt');
+
 // Keep salt in env file so that key to the code is secure
-var salt = process.env.bcryptSalt;
-console.log("env salt:", process.env.bcryptSalt);
+// const salt = process.env.bcryptSalt;
+console.log("env salt:", process.env.salt);
+
+const salt ="$2b$10$71a572gQNwnao9er1mIk8O";
+
 
 // Handles simple hashing of inputs
 function hashThis(input) {
     console.log("hashThis input:", input);
+    console.log("hashThis salt:", salt);
     const hash = bcrypt.hashSync(input, salt);
     return hash
 }

@@ -6,6 +6,7 @@ import TextCard from '../../parts/TextCard';
 import UserSignUp from '../../parts/SignUp/UserSignUp';
 import SweetAlert from 'react-bootstrap-sweetalert';
 import EditUser from '../../parts/Models/EditUser';
+import LogIn from '../../parts/Models/LogIn';
 const mailformat = /^\w+([\.-]?\w+)*@\w+([\.-]?\w+)*(\.\w{2,3})+$/;
 
 class Home extends Component{
@@ -36,18 +37,24 @@ class Home extends Component{
             updateEmail: "",
             updatePassword: "",
             updatePhoneNum: "",
+
+            // Log in user form
+            logInUsername: "",
+            logInPassword: "",
         }
     }
 
     // When page loads see inital state value
     componentDidMount(){
         console.log("Mount State: " , this.state);
-        this.getUsers();
+        // this.getUsers();
+        // localStorage.removeItem("token");
     }
 
     // Every time state changes this function fires to give you a update all changes and thier values
     componentDidUpdate(){
         console.log("Updated State: ", this.state);
+        console.log("token present", localStorage.getItem("token"))
     }
 
     // General handler for inputs thats value is to change the state
@@ -152,7 +159,7 @@ class Home extends Component{
         )
         // Update state to show model
         this.setState({
-          title: `${user.first_name} ${user.last_name}`,
+          title: user.name,
           text: text,
           show: true
         })
@@ -196,11 +203,25 @@ class Home extends Component{
         })
     }
 
+    signInModel = () => {
+        let text = (
+            <LogIn
+                handleInputChange={this.props.handleChange}
+                logIn={this.props.logIn}
+            />
+        )
+        // Update state to show model
+        this.setState({
+        title: "Sign into your account",
+        text: text,
+        show: true
+        })
+    }
+
     render() {
         
         return (
             <div className="pt-4">
-
 
                 {/* Generic model waiting for function to show and fill it */}
                 <SweetAlert
@@ -221,9 +242,18 @@ class Home extends Component{
                         <TextCard 
                             title="Basic component"
                             subtitle="DB test form">
-                                <Button color="info" onClick={() => this.getUsers()}>
+                                <Button className="m-1" color="info" onClick={() => this.getUsers()}>
                                     Get all users in DB
                                 </Button>
+
+                                <Button className="m-1" color="primary" onClick={() => this.signInModel()}>
+                                    Log in
+                                </Button>
+
+                                <Button className="m-1" color="warning" onClick={() => this.signOut()}>
+                                    Sign Out
+                                </Button>
+                                
                                 {/* Sign up component holds the actual form inside of another component files kept nested to 
                                     help with organization  */}
                                 <UserSignUp 

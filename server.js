@@ -5,8 +5,8 @@ const mongoose = require("mongoose");
 const routes = require("./app/routes");
 const app = express();
 const path = require("path");
-const PORT = process.env.PORT || 3001;
 const dotenv = require("dotenv");
+const PORT = process.env.PORT || 3001;
 
 // Configure dotenv to server to use .env files
 dotenv.config();

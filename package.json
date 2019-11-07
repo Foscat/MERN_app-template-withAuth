@@ -19,8 +19,8 @@
   "author": "Foscat",
   "license": "ISC",
   "devDependencies": {
-    "concurrently": "^4.1.0",
-    "nodemon": "^1.18.7"
+    "concurrently": "^4.1.2",
+    "nodemon": "^1.19.4"
   },
   "dependencies": {
     "axios": ">=0.18.1",
@@ -29,9 +29,9 @@
     "express": "^4.16.3",
     "if-env": "^1.0.4",
     "jsonwebtoken": "^8.5.1",
-    "mongoose": "^5.3.16",
+    "mongoose": "^5.7.8",
     "prop-types": "^15.7.2",
-    "react": "^16.8.5"
+    "react": "^16.11.0"
   },
   "bugs": {
     "url": "https://github.com/Foscat/MERN_app-template-withAuth/issues"
