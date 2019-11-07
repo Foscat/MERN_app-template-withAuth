@@ -1,10 +1,10 @@
-# MERN_app-template
-Boilerplate for full MERN stack apps
+# MERN_app-template-withAuth
+Boilerplate for full MERN stack apps that require security features.
 
 ## Overview
 Full stack ready for deployment with built in CRUD functions and components.
 Made so the file structure is easy to follow and replicate to keep order as app increases in size.
-Comes with basic dependencies so developers can choose to add redux or other depencies on top off it. But allows for devs to have more choce on how app is built.
+Comes with basic dependencies so developers can choose to add redux or other depencies on top off it. But allows for devs to have more choce on how app is built. This version comes with jsonwebtoken and bcrypt for hashing and authentication.
 
 **__Site is deployment ready out of the box__**
 
@@ -18,13 +18,13 @@ Once dependencies are installed type *npm start* in termial. This will start the
 ### Easy to build on top of
 * File structure designed to make large scale projects in organized way.
 * index.js files in folders to serve as directory routes for files in folder
-* Built in Crud functions and front end components as working example to copy and re-use
+* Built in CRUD functions with custom error handeling and front end components as working example to copy and re-use
 * Comes with Bootstrap as cdn so it is easy use and replace
 
 ### Dependencies 
 
 **Back End**
-- Concurrently - Allows package JSON scripts to candle multiple commands
+- Concurrently - Allows package JSON scripts to handle multiple commands
 - Nodemon - For when you are in development any save will refresh server to give live update of changes
 - Axios - For communicating with front end
 - Express - For helping build a server and serving assests
@@ -32,7 +32,9 @@ Once dependencies are installed type *npm start* in termial. This will start the
 - Prop-types - Helps react with hanldeing props
 - React - To let app work in a react environment
 - If-env - Has app check for env
-- dotenv - Allows .env files to be used in app. 
+- Dotenv - Allows .env files to be used in app. 
+- Bcrypt - For encrypting data
+- Jsonwebtoken - For handleing authorization
 
 **Front End**
 - Axios - For communicating with back end routes
@@ -44,4 +46,4 @@ Once dependencies are installed type *npm start* in termial. This will start the
 - Reactstrap - Special components made just for react
 - Moment - For easy formatting of dates
 
-See a working delpoyed version here: https://glacial-everglades-91451.herokuapp.com/
+See a working delpoyed version here: 

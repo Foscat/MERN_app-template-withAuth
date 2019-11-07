@@ -47,7 +47,7 @@ app.use(function(req, res, next) {
 });
 
 // Connect to MongoDB
-// To make custom data base just put the name you want for the db where 'mern_app-template-withauth' is.
+// To make custom database just put the name you want for the db where 'mern_app-template-withauth' is.
 mongoose.connect(
     process.env.MONGODB_URI || "mongodb://localhost/mern_app-template-withauth",
     {
