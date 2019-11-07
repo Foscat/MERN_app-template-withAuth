@@ -108,19 +108,18 @@ module.exports = {
   },
   currentUser: function(req,res){
 
-    console.log("Authentication request", req.body);
+    // console.log("Authentication request", req.body);
 
     var token = req.body.token;
     console.log("currentUser token:",token);
 
     //decode token
-    var decoded = jwt.decode(token);
+    var decoded = jwt.decode(token)
     console.log("currentUser decoded:",decoded);
-
     //if data exists, return user data
     if (decoded.data) {
       db.User.find({ _id: decoded.data }).then(function(data, err) {
-        if (err) throw err;
+        if (err) throw res.json(err);
         console.log("currentUser() find() decoded._id data:",data);
         res.json(data);
       });
@@ -147,6 +146,7 @@ module.exports = {
         if(err)res.send({data:{message:"There was an error", info:err}});
         // if(Object.keys(data).length <= 0)res.send({data:{message:"There is no data in response.", data:data}});
         if(hashedInput === data[0].password){
+          console.log("Hash and password match");
           // Generate token
           let token = jwt.sign({data: data[0]._id}, "secret");
           console.log("jwt token:", token);

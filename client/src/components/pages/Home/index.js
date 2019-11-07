@@ -47,8 +47,10 @@ class Home extends Component{
     // When page loads see inital state value
     componentDidMount(){
         console.log("Mount State: " , this.state);
-        // this.getUsers();
-        // localStorage.removeItem("token");
+        this.getUsers();
+        if(localStorage.getItem("token")){
+            localStorage.removeItem("token");
+        }
     }
 
     // Every time state changes this function fires to give you a update all changes and thier values
@@ -209,7 +211,7 @@ class Home extends Component{
                 handleInputChange={this.props.handleChange}
                 logIn={this.props.logIn}
             />
-        )
+        );
         // Update state to show model
         this.setState({
         title: "Sign into your account",
@@ -250,7 +252,7 @@ class Home extends Component{
                                     Log in
                                 </Button>
 
-                                <Button className="m-1" color="warning" onClick={() => this.signOut()}>
+                                <Button className="m-1" color="warning" onClick={() => this.props.signOut()}>
                                     Sign Out
                                 </Button>
                                 

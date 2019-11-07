@@ -31,6 +31,6 @@ export default {
   },
   // Authenticate user
   currentUser: function(token){
-    return axios.post("/api/users/current", { token: token});
+    return axios.post("/api/users/current", token);
   }
 }

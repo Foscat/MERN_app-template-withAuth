@@ -5,6 +5,7 @@ import WorkBench from './components/pages/WorkBench';
 import NoMatch from './components/pages/NoMatch';
 import NavBar from "./components/parts/NavBar";
 import API from './utils/API';
+import UserHome from './components/pages/UserHome';
 
 // This is the router for react page components
 class App extends Component {
@@ -14,7 +15,7 @@ class App extends Component {
         this.state = {
             user: "",
             loading: false,
-            token: "",
+            token: localStorage.getItem("token"),
             loggedIn: false,
         }
     }
@@ -58,7 +59,7 @@ class App extends Component {
         // After form submits call function to get all users to see updated info and close model
         .then(res => {
             console.log(res);
-            this.setState({show: false, token: res.data.info, user: res.data.user});
+            this.setState({show: false, token: res.data.info, user: res.data.user, loggedIn:true});
             localStorage.setItem("token",res.data.info);
         })
     }
@@ -75,10 +76,21 @@ class App extends Component {
 
     signOutUser = () => {
         localStorage.removeItem("token");
-        this.setState({ token: null, user: "", loggedIn: false });
+        this.setState({ user: "", loggedIn: false });
     };
 
     render() {
+        let home;
+        if(!this.state.loggedIn){
+            home =  <Home 
+                    logIn={this.logInUser} 
+                    handleChange={this.handleInputChange}
+                    signOut={this.signOutUser}
+                />
+        }
+        else {
+            home = <UserHome user={this.state.user[0]} signOut={this.signOutUser} />
+        }
         return (
             <div>
                 {/* Allows navbar to stay on all pages */}
@@ -88,11 +100,7 @@ class App extends Component {
                         <Switch>
                             {/* 'exact path' is how you set up html page routes */}
                             <Route exact path="/" render={() => (
-                                <Home 
-                                    logIn={this.logInUser} 
-                                    handleChange={this.handleInputChange}
-                                    signOut={this.signOutUser}
-                                />
+                                home
                             )}  />
                             {/* Workbench is for writing new code to keep new parts isolated for easier developing */}
                             <Route exact path="/workbench" component={WorkBench} />
