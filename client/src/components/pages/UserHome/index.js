@@ -49,8 +49,8 @@ class UserHome extends Component {
               <li>{this.state.user.createdAt}</li>
             </ul>
 
-            <button type="button" onClick={this.checkCreds}>Authenticate me</button>
-            <button type="button" className="btn-danger" onClick={this.props.signOut}>Sign out</button>
+            <button type="button" className="btn btn-info m-1" onClick={this.checkCreds}>Authenticate me</button>
+            <button type="button" className="btn btn-danger m-1" onClick={this.props.signOut}>Sign out</button>
           </TextCard>
         </div>
       )

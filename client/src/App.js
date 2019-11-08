@@ -20,14 +20,14 @@ class App extends Component {
         }
     }
 
-    componentDidMount(){
-        console.log("App mount state:", this.state);
-        console.log("local storage token: ", localStorage.getItem("token"))
-    }
+    // componentDidMount(){
+    //     console.log("App mount state:", this.state);
+    //     console.log("local storage token: ", localStorage.getItem("token"))
+    // }
 
-    componentDidUpdate(){
-        console.log("App update state:", this.state);
-    }
+    // componentDidUpdate(){
+    //     console.log("App update state:", this.state);
+    // }
 
     // General handler for inputs thats value is to change the state
     // If state does not exsist it makes a state field with its name
@@ -58,7 +58,7 @@ class App extends Component {
         })
         // After form submits call function to get all users to see updated info and close model
         .then(res => {
-            console.log(res);
+            // console.log(res);
             this.setState({show: false, token: res.data.info, user: res.data.user, loggedIn:true});
             localStorage.setItem("token",res.data.info);
         })
@@ -67,7 +67,7 @@ class App extends Component {
     authenticate = () => {
         API.currentUser({token: this.state.token})
         .then(res => {
-            console.log("Authenticate res",res);
+            // console.log("Authenticate res",res);
         })
         .catch(err => {
             console.error("Authentication error", err);
