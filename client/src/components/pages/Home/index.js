@@ -82,7 +82,7 @@ class Home extends Component{
 
     // Function that handles adding a customer to the db
     signUpUser = async () => {
-        // console.log("Add user state: ", this.state);
+        console.log("Add user state: ", this.state);
         const s = this.state;
         // Check that email is in correct format
         if(this.validateEmailInput(s.addEmail));
@@ -114,7 +114,7 @@ class Home extends Component{
         })
         .catch(err=>console.error("You hit an error: ",err))
         .then(res => {
-            // console.log("Add user res:", res);
+            console.log("Add user res:", res);
             // Comment back in for deployment but comment out for testing inputs
             window.location.reload(false);
         })
@@ -122,7 +122,7 @@ class Home extends Component{
 
     // Grabs all users in db and displays them on the DOM
     getUsers= async () => {
-        // console.log("Get users: ", this.state);
+        console.log("Get users: ", this.state);
         // When users are pulled from the db the are put into an array. That array when it contains info loops and makes cards for each user
         API.getUsers().then(res => this.setState({ userPool: res.data }))
         .catch(err => console.error(err));
@@ -131,7 +131,7 @@ class Home extends Component{
     // Function that handles the deleting of a single user from the db
     // This will be tied to a button that is tied to a specific user
     deleteUser = id => {
-        // console.log("Delete function started");
+        console.log("Delete function started");
         alert("You are deleting someting from the db!");
         // Send request to util api call
         API.deleteUser(id).then(res => {
@@ -200,6 +200,7 @@ class Home extends Component{
         })
         // After form submits call function to get all users to see updated info and close model
         .then(() => {
+            console.log("User updated")
             this.getUsers();
             this.setState({ show : false});
         })
