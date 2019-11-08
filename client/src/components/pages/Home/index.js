@@ -116,7 +116,7 @@ class Home extends Component{
         .then(res => {
             console.log("Add user res:", res);
             // Comment back in for deployment but comment out for testing inputs
-            window.location.reload(false);
+            // window.location.reload(false);
         })
     };
 
