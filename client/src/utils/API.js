@@ -14,7 +14,7 @@ export default {
   getUsers: function() {
     return axios.get("/api/users");
   },
-  // Update info on user
+  // Update info on a user
   updateUser: function(id, updateData) {
     console.log("Update user id and data: ", id, updateData);
     return axios.put("/api/users/" + id, updateData)
@@ -29,7 +29,7 @@ export default {
     console.log("Sign in user data:", signInData);
     return axios.post("/api/users/signIn", signInData);
   },
-  // Authenticate user
+  // Authenticate a user
   currentUser: function(token){
     return axios.post("/api/users/current", token);
   }

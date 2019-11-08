@@ -46,7 +46,7 @@ class Home extends Component{
 
     // When page loads see inital state value
     componentDidMount(){
-        console.log("Mount State: " , this.state);
+        // console.log("Mount State: " , this.state);
         this.getUsers();
         if(localStorage.getItem("token")){
             localStorage.removeItem("token");
@@ -54,10 +54,10 @@ class Home extends Component{
     }
 
     // Every time state changes this function fires to give you a update all changes and thier values
-    componentDidUpdate(){
-        console.log("Updated State: ", this.state);
-        console.log("token present", localStorage.getItem("token"))
-    }
+    // componentDidUpdate(){
+        // console.log("Updated State: ", this.state);
+        // console.log("token present", localStorage.getItem("token"))
+    // }
 
     // General handler for inputs thats value is to change the state
     // If state does not exsist it makes a state field with its name
@@ -82,7 +82,7 @@ class Home extends Component{
 
     // Function that handles adding a customer to the db
     signUpUser = async () => {
-        console.log("Add user state: ", this.state);
+        // console.log("Add user state: ", this.state);
         const s = this.state;
         // Check that email is in correct format
         if(this.validateEmailInput(s.addEmail));
@@ -114,15 +114,15 @@ class Home extends Component{
         })
         .catch(err=>console.error("You hit an error: ",err))
         .then(res => {
-            console.log("Add user res:", res);
+            // console.log("Add user res:", res);
             // Comment back in for deployment but comment out for testing inputs
-            // window.location.reload(false);
+            window.location.reload(false);
         })
     };
 
     // Grabs all users in db and displays them on the DOM
     getUsers= async () => {
-        console.log("Get users: ", this.state);
+        // console.log("Get users: ", this.state);
         // When users are pulled from the db the are put into an array. That array when it contains info loops and makes cards for each user
         API.getUsers().then(res => this.setState({ userPool: res.data }))
         .catch(err => console.error(err));
@@ -131,7 +131,7 @@ class Home extends Component{
     // Function that handles the deleting of a single user from the db
     // This will be tied to a button that is tied to a specific user
     deleteUser = id => {
-        console.log("Delete function started");
+        // console.log("Delete function started");
         alert("You are deleting someting from the db!");
         // Send request to util api call
         API.deleteUser(id).then(res => {
@@ -250,10 +250,6 @@ class Home extends Component{
 
                                 <Button className="m-1" color="primary" onClick={() => this.signInModel()}>
                                     Log in
-                                </Button>
-
-                                <Button className="m-1" color="warning" onClick={() => this.props.signOut()}>
-                                    Sign Out
                                 </Button>
                                 
                                 {/* Sign up component holds the actual form inside of another component files kept nested to 

@@ -99,9 +99,7 @@ class App extends Component {
                     <div>
                         <Switch>
                             {/* 'exact path' is how you set up html page routes */}
-                            <Route exact path="/" render={() => (
-                                home
-                            )}  />
+                            <Route exact path="/" render={() => home}  />
                             {/* Workbench is for writing new code to keep new parts isolated for easier developing */}
                             <Route exact path="/workbench" component={WorkBench} />
                             {/* If no url routes match show error page */}

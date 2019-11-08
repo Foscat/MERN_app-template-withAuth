@@ -6,13 +6,13 @@ const mailformat = /^\w+([\.-]?\w+)*@\w+([\.-]?\w+)*(\.\w{2,3})+$/;
 // Defining methods for the userController
 module.exports = {
   findAll: function(req, res) {
-    console.log("find all users request");
+    console.log("Find all users request.");
     db.User.find(req.query)
       .then(dbUser => res.json(dbUser))
       .catch(err => res.status(422).json(err));
   },
   findById: function(req, res) {
-    console.log("find user by id request");
+    console.log("Find user by id request.");
     // If a request parameter has an id search db 
     if(req.params.id){
       console.log(`Find by id ${req.params.id}`)
@@ -22,7 +22,7 @@ module.exports = {
     }
     // If no id present return custom error
     else{
-      console.log("Find by id error");
+      console.log("findById error");
       res.send({
         message: "There is no id present in your request.",
         info: {givenId: req.params.id}
@@ -30,7 +30,7 @@ module.exports = {
     }
   },
   create: function(req, res) {
-    console.log("create user request");
+    console.log("Create user request.");
     // Check to see request actually has a body with values
     if(Object.keys(req.body).length){
       if(!req.body.email.match(mailformat)) res.send({
@@ -38,6 +38,7 @@ module.exports = {
         info: req.body
       })
 
+      // Hash the password and make the info to be saved to be the hashed version
       let hashPw = hash.hashThis(req.body.password);
       req.body.password = hashPw;
 
@@ -66,12 +67,12 @@ module.exports = {
     }
   },
   update: function(req, res) {
-    console.log("update user request")
+    console.log("Update user request.")
     // If the request does not have an id param or request body return a custom error
     if(!req.params.id || req.body === {}){
-      console.log("Missing data in user update request");
+      console.log("Missing data in user update request.");
       res.send({
-        message: "There is missing data in your request",
+        message: "There is missing data in your request.",
         info: {
           givenId: req.params.id,
           givenData: req.body
@@ -79,14 +80,14 @@ module.exports = {
       })
     }
     else{
-      console.log("Find one user and update request", req.params.id, req.body);
+      console.log("Find one user and update request.", req.params.id, req.body);
       db.User.findOneAndUpdate({ _id: req.params.id }, req.body)
       .then(dbUser => (res.json(dbUser)))
       .catch(err => res.status(422).json(err));
     }
   },
   remove: function(req, res) {
-    console.log("remove user request");
+    console.log("Remove user request.");
     // If a id is present then run delete
     if(req.params.id){
       db.User.findById(req.params.id)
@@ -107,15 +108,15 @@ module.exports = {
     }
   },
   currentUser: function(req,res){
-
-    // console.log("Authentication request", req.body);
+    console.log("Authenticate user request");
 
     var token = req.body.token;
-    console.log("currentUser token:",token);
+    // console.log("currentUser token:",token);
 
     //decode token
     var decoded = jwt.decode(token)
-    console.log("currentUser decoded:",decoded);
+    // console.log("currentUser decoded:",decoded);
+
     //if data exists, return user data
     if (decoded.data) {
       db.User.find({ _id: decoded.data }).then(function(data, err) {
@@ -131,28 +132,25 @@ module.exports = {
     }
   },
   signInUser: function(req,res){
-
-    console.log("sign in user request", req.body);
+    console.log("Sign in user request.");
 
     //hash pw
     var hashedInput = hash.hashThis(req.body.password);
-    console.log("hashedInput:", hashedInput);
+    // console.log("hashedInput:", hashedInput);
 
     db.User.find({username: req.body.username})
       .then((data,err) => {
-
-        console.log("Found one", data, err);
-
-        if(err)res.send({data:{message:"There was an error", info:err}});
-        // if(Object.keys(data).length <= 0)res.send({data:{message:"There is no data in response.", data:data}});
+        // console.log("Found one", data, err);
+        if(err)res.send({message:"There was an error", info:err});
+        if(Object.keys(data).length <= 0)res.send({message:"There is no data in response.", info:data});
         if(hashedInput === data[0].password){
           console.log("Hash and password match");
           // Generate token
           let token = jwt.sign({data: data[0]._id}, "secret");
-          console.log("jwt token:", token);
+          // console.log("jwt token:", token);
           res.send({message:"Token recived", info:token, user: data})
         }
-        else res.send({message:"Something went wrong.", info:{1:data,2:err}})
+        else res.send({message:"Something went wrong.", info:{dataObj:data, errObj:err}})
       })
       .catch(err => res.send({message:"A user was not found by that name.", info: err}));
   },
