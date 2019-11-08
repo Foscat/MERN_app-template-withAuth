@@ -46,4 +46,4 @@ Once dependencies are installed type *npm start* in termial. This will start the
 - Reactstrap - Special components made just for react
 - Moment - For easy formatting of dates
 
-See a working delpoyed version here: 
+See a working delpoyed version here: https://arcane-beach-57949.herokuapp.com/
