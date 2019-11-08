@@ -280,11 +280,11 @@ class Home extends Component{
                                             <span><h6>Email:</h6> <p>{user.email}</p></span>
                                             <span><h6>Password:</h6> <p>{user.password}</p></span>
                                             {/* Delete this user button */}
-                                            <Button color="danger" onClick={() => this.deleteUser(user._id)}>
+                                            <Button className="m-1" color="danger" onClick={() => this.deleteUser(user._id)}>
                                                 Delete
                                             </Button>
                                             {/* Edit user button */}
-                                            <Button color="info" onClick={() =>  this.editUserModal(user)}>
+                                            <Button className="m-1" color="info" onClick={() =>  this.editUserModal(user)}>
                                                 Edit
                                             </Button>
                                         </TextCard>
