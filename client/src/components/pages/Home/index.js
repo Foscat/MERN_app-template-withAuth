@@ -1,6 +1,5 @@
 import React, { Component } from 'react';
 import { Row, Col, Button  } from 'reactstrap';
-import moment from "moment";
 import API from '../../../utils/API';
 import TextCard from '../../parts/TextCard';
 import UserSignUp from '../../parts/SignUp/UserSignUp';
@@ -109,14 +108,13 @@ class Home extends Component{
             username: s.addUsername,
             email: s.addEmail,
             password: s.addPassword,
-            phone_num: s.addPhoneNum,
-            createdAt: moment().format("dddd, MMMM Do YYYY, h:mm:ss a")
+            phone_num: s.addPhoneNum
         })
         .catch(err=>console.error("You hit an error: ",err))
         .then(res => {
-            // console.log("Add user res:", res);
+            console.log("Add user res:", res);
             // Comment back in for deployment but comment out for testing inputs
-            window.location.reload(false);
+            // window.location.reload(false);
         })
     };
 
@@ -195,8 +193,7 @@ class Home extends Component{
             username: s.updateUsername,
             email: s.updateEmail,
             password: s.updatePassword,
-            phone_num: s.updatePhoneNum,
-            updatedAt: moment().format("dddd, MMMM Do YYYY, h:mm:ss a")
+            phone_num: s.updatePhoneNum
         })
         // After form submits call function to get all users to see updated info and close model
         .then(() => {
@@ -215,7 +212,7 @@ class Home extends Component{
         );
         // Update state to show model
         this.setState({
-        title: "Sign into your account",
+        title: "Sign into an account",
         text: text,
         show: true
         })
@@ -291,8 +288,8 @@ class Home extends Component{
                                     )
                                 })}
                             </div>
-                            // If nothing is in array display empty p tag
-                        ) : (<p></p>)}
+                            // If nothing is in array display null
+                        ) : null}
                     </Col>
 
                 </Row>

@@ -1,5 +1,6 @@
 const db = require("../models");
 const jwt = require("jsonwebtoken");
+const moment = require("moment");
 const hash = require("./hash");
 const mailformat = /^\w+([\.-]?\w+)*@\w+([\.-]?\w+)*(\.\w{2,3})+$/;
 
@@ -37,6 +38,9 @@ module.exports = {
         message: "Email format is not correct.", 
         info: req.body
       })
+
+      // Use the backend runtime to handle created at timestamp
+      Object.assign(req.body, {createdAt: moment().format("dddd, MMMM Do YYYY, h:mm:ss a")});
 
       // Hash the password and make the info to be saved to be the hashed version
       let hashPw = hash.hashThis(req.body.password);
@@ -80,6 +84,9 @@ module.exports = {
       })
     }
     else{
+      // Use the backend runtime to handle updatedAt timestamp
+      Object.assign(req.body, {updatedAt: moment().format("dddd, MMMM Do YYYY, h:mm:ss a")});
+
       console.log("Find one user and update request.", req.params.id, req.body);
       db.User.findOneAndUpdate({ _id: req.params.id }, req.body)
       .then(dbUser => (res.json(dbUser)))

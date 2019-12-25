@@ -38,14 +38,6 @@ class WorkBench extends Component {
     });
   }
 
-  handleSubmit(event) {
-    event.preventDefault();
-    console.log("Event.target", event.target);
-    const data = new FormData(event.target);
-    console.log("Data:", data)
-    API.addUser(event.target).then(res=>console.log("form res", res));
-  }
-
   render() {
     return (
       <Row style={styles.box} className="pt-5">
