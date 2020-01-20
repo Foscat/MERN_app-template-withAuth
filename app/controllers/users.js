@@ -89,6 +89,7 @@ module.exports = {
 
       console.log("Find one user and update request.", req.params.id, req.body);
       db.User.findOneAndUpdate({ _id: req.params.id }, req.body)
+      .catch(err => res.send({message:"findOneAndUpdate hit an error", info:err}))
       .then(dbUser => (res.json(dbUser)))
       .catch(err => res.status(422).json(err));
     }
