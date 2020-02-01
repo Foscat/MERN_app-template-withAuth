@@ -1,6 +1,8 @@
 # MERN_app-template-withAuth
 Boilerplate for full MERN stack apps that require security features.
 
+### **Built using node version 11.2.0**
+
 ## Overview
 Full stack ready for deployment with built in CRUD functions and components.
 Made so the file structure is easy to follow and replicate to keep order as app increases in size.

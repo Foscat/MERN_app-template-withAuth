@@ -1,5 +1,5 @@
-import React from 'react';
-import { Button ,FormGroup, Label, Input } from 'reactstrap';
+import React from "react";
+import { Button ,FormGroup, Label, Input } from "reactstrap";
 
 const EditUser = (props) => {
     return (

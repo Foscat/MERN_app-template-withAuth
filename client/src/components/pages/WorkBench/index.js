@@ -2,7 +2,7 @@ import React, { Component } from 'react';
   // Comment out to prevent warnings when needed they are here for easy access 
 import { Row } from 'reactstrap';
 import TextCard from '../../parts/TextCard';
-import API from '../../../utils/API';
+// import API from '../../../utils/API';
 // import SweetAlert from 'react-bootstrap-sweetalert';
 
 

@@ -4,8 +4,8 @@ import API from '../../../utils/API';
 import TextCard from '../../parts/TextCard';
 import UserSignUp from '../../parts/SignUp/UserSignUp';
 import SweetAlert from 'react-bootstrap-sweetalert';
-import EditUser from '../../parts/Models/EditUser';
-import LogIn from '../../parts/Models/LogIn';
+import EditUser from '../../parts/modals/EditUser';
+import LogIn from '../../parts/modals/LogIn';
 const mailformat = /^\w+([\.-]?\w+)*@\w+([\.-]?\w+)*(\.\w{2,3})+$/;
 
 class Home extends Component{
@@ -25,7 +25,7 @@ class Home extends Component{
             addPassword: "",
             addPhoneNum: 0,
 
-            // Model attrs
+            // Modal attrs
             show: false,
             title: "Sweetie",
             text: null,
@@ -48,7 +48,7 @@ class Home extends Component{
         // console.log("Mount State: " , this.state);
         this.getUsers();
         if(localStorage.getItem("token")){
-            localStorage.removeItem("token");
+            this.props.authenticate()
         }
     }
 
@@ -121,7 +121,8 @@ class Home extends Component{
     // Grabs all users in db and displays them on the DOM
     getUsers= async () => {
         // console.log("Get users: ", this.state);
-        // When users are pulled from the db the are put into an array. That array when it contains info loops and makes cards for each user
+        // When users are pulled from the db the are put into an array.
+        // That array when it contains info loops and makes cards for each user
         API.getUsers().then(res => this.setState({ userPool: res.data }))
         .catch(err => console.error(err));
     }
@@ -138,7 +139,7 @@ class Home extends Component{
         })
     }
 
-    // Sweet alert model that contains form for PUT operations 
+    // Sweet alert modal that contains form for PUT operations 
     editUserModal = user => {
         this.setState({ 
             updateName: user.name,
@@ -165,7 +166,7 @@ class Home extends Component{
         })
     }
 
-    // When the update form on the model is submitted this function fires
+    // When the update form on the modal is submitted this function fires
     handleUpdateFormSubmit = (id) => {
         let s = this.state;
         // Check that email is in correct format
@@ -195,7 +196,7 @@ class Home extends Component{
             password: s.updatePassword,
             phone_num: s.updatePhoneNum
         })
-        // After form submits call function to get all users to see updated info and close model
+        // After form submits call function to get all users to see updated info and close modal
         .then(() => {
             // console.log("User updated");
             this.getUsers();
@@ -203,7 +204,7 @@ class Home extends Component{
         })
     }
 
-    signInModel = () => {
+    signInModal = () => {
         let text = (
             <LogIn
                 handleInputChange={this.props.handleChange}
@@ -246,7 +247,7 @@ class Home extends Component{
                                     Get all users in DB
                                 </Button>
 
-                                <Button className="m-1" color="primary" onClick={() => this.signInModel()}>
+                                <Button className="m-1" color="primary" onClick={() => this.signInModal()}>
                                     Log in
                                 </Button>
                                 

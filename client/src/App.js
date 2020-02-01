@@ -13,21 +13,21 @@ class App extends Component {
     constructor(props){
         super(props);
         this.state = {
-            user: "",
+            user: null,
             loading: false,
             token: localStorage.getItem("token"),
             loggedIn: false,
         }
     }
 
-    // componentDidMount(){
-    //     console.log("App mount state:", this.state);
-    //     console.log("local storage token: ", localStorage.getItem("token"))
-    // }
+    componentDidMount(){
+        console.log("App mount state:", this.state);
+        // this.authenticate();
+    }
 
-    // componentDidUpdate(){
-    //     console.log("App update state:", this.state);
-    // }
+    componentDidUpdate(){
+        console.log("App update state:", this.state);
+    }
 
     // General handler for inputs thats value is to change the state
     // If state does not exsist it makes a state field with its name
@@ -59,37 +59,46 @@ class App extends Component {
         // After form submits call function to get all users to see updated info and close model
         .then(res => {
             // console.log(res);
-            this.setState({show: false, token: res.data.info, user: res.data.user, loggedIn:true});
+            
+            this.setState({show: false, user: res.data.user, loggedIn:true});
             localStorage.setItem("token",res.data.info);
         })
     }
 
-    authenticate = () => {
+    authenticate = async () => {
         API.currentUser({token: this.state.token})
         .then(res => {
-            // console.log("Authenticate res",res);
+            console.log("Authenticate res",res);
+            this.setState({ user: res.data[0], loggedIn: true });
+            return res.data[0];
         })
         .catch(err => {
             console.error("Authentication error", err);
+            return err;
         })
     }
 
     signOutUser = () => {
         localStorage.removeItem("token");
-        this.setState({ user: "", loggedIn: false });
+        this.setState({ user: null, token:"", loggedIn: false });
     };
 
     render() {
         let home;
-        if(!this.state.loggedIn){
+        if(!this.state.loggedIn && this.state.user === null){
             home =  <Home 
                     logIn={this.logInUser} 
+                    authenticate={this.authenticate}
                     handleChange={this.handleInputChange}
                     signOut={this.signOutUser}
                 />
         }
         else {
-            home = <UserHome user={this.state.user[0]} signOut={this.signOutUser} />
+            home = <UserHome 
+                    user={this.state.user || null} 
+                    signOut={this.signOutUser} 
+                    authenticate={this.authenticate}
+                    />
         }
         return (
             <div>
