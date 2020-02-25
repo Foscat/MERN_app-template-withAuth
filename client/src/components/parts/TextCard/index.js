@@ -4,26 +4,26 @@ import { Card, CardBody, CardHeader, CardTitle, CardSubtitle } from 'reactstrap'
 // General use card for wrapping around other components and give clean presentaiton
 // Takes is style props to give ease of css 
 
-const TextCard = (props) => {
+const TextCard = ({className, style, title, subtitle, contentStyle, children}) => {
     return(
-        <Card className={props.className} style={props.style}>
+        <Card className={className} style={style}>
         
             <CardHeader>
 
                 <CardTitle>
-                    <h2>{props.title}</h2>
+                    <h2>{title}</h2>
                 </CardTitle>
 
                 <CardSubtitle>
-                    <h4>{props.subtitle}</h4>
+                    <h4>{subtitle}</h4>
                 </CardSubtitle>
 
             </CardHeader>
 
             <CardBody>
 
-                <div style={props.contentStyle}>
-                    {props.children}
+                <div style={contentStyle}>
+                    {children}
                 </div>
     
             </CardBody>

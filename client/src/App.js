@@ -60,17 +60,22 @@ class App extends Component {
         .then(res => {
             // console.log(res);
             
-            this.setState({show: false, user: res.data.user, loggedIn:true});
+            this.setState({show: false, user: res.data.user[0], loggedIn:true});
             localStorage.setItem("token",res.data.info);
         })
+        .catch(err => this.setState({ user: err }))
     }
 
     authenticate = async () => {
         API.currentUser({token: this.state.token})
         .then(res => {
             console.log("Authenticate res",res);
-            this.setState({ user: res.data[0], loggedIn: true });
-            return res.data[0];
+            if(!res.data.length){
+                return "authentication failed"
+            }
+            else {
+                this.setState({ user: res.data[0], loggedIn: true });
+                return res.data[0];}
         })
         .catch(err => {
             console.error("Authentication error", err);
@@ -85,7 +90,7 @@ class App extends Component {
 
     render() {
         let home;
-        if(!this.state.loggedIn && this.state.user === null){
+        if(!this.state.loggedIn || !this.state.user){
             home =  <Home 
                     logIn={this.logInUser} 
                     authenticate={this.authenticate}
@@ -95,7 +100,7 @@ class App extends Component {
         }
         else {
             home = <UserHome 
-                    user={this.state.user || null} 
+                    user={this.state.user} 
                     signOut={this.signOutUser} 
                     authenticate={this.authenticate}
                     />

@@ -8,7 +8,7 @@ class UserHome extends Component {
         super(props);
 
         this.state={
-            user: this.props.user
+          user: this.props.user
         }
     }
 
@@ -20,16 +20,17 @@ class UserHome extends Component {
     // }
 
     render() {
+      const {user } = this.state;
       return (
         <div>
           <TextCard 
-            title={`Name: ${this.state.user.name}`}
-            subtitle={`Username: ${this.state.user.username}`}
+            title={`Name: ${user.name}`}
+            subtitle={`Username: ${user.username}`}
           >
             <ul>
-              <li>{this.state.user.phone_num}</li>
-              <li>{this.state.user.email}</li>
-              <li>{this.state.user.createdAt}</li>
+              <li>{user.phone_num}</li>
+              <li>{user.email}</li>
+              <li>{user.createdAt}</li>
             </ul>
 
             <button type="button" className="btn btn-danger m-1" onClick={this.props.signOut}>Sign out</button>
