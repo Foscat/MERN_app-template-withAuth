@@ -37,6 +37,8 @@ Once dependencies are installed type *npm start* in termial. This will start the
 - Dotenv - Allows .env files to be used in app. 
 - Bcrypt - For encrypting data
 - Jsonwebtoken - For handleing authorization
+- Kind-of - Manual update for dependencies
+- Minimist - Manual update for dependencies
 
 **Front End**
 - Axios - For communicating with back end routes
