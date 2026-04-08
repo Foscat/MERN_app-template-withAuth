@@ -1,3 +1,7 @@
+/**
+ * @module components.pages.NoMatch
+ * @description Legacy page component module.
+ */
 import React from "react";
 import { Col, Row, Container } from "reactstrap";
 import FlexTron from "../parts/FlexTron";

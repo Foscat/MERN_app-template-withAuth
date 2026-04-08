@@ -1,19 +1,27 @@
-const bcrypt = require('bcrypt');
+/**
+ * @module app/controllers/hash
+ * @description Password hashing utilities used by authentication flows.
+ */
 
-// Handles simple hashing of inputs
+const bcrypt = require("bcrypt");
+
+/**
+ * Hash plain text input using bcrypt.
+ * @param {string} input - Plain text password.
+ * @returns {string} Bcrypt hash.
+ */
 function hashThis(input) {
-    // console.log("hashThis input:", input);
-    // console.log("hashThis salt:", process.env.salt);
-    const hash = bcrypt.hashSync(input, process.env.salt);
-    return hash
+  return bcrypt.hashSync(input, process.env.salt);
 }
 
-// Handles hash comparisons
+/**
+ * Compare a plain text value to a bcrypt hash.
+ * @param {string} plainTxt - Plain text password.
+ * @param {string} hash - Stored bcrypt hash.
+ * @returns {Promise<boolean>} True when the values match.
+ */
 function compareHash(plainTxt, hash) {
-    // console.log("compareHash plainTxt:", plainTxt);
-    // console.log("compareHash hash:", hash);
-    return bcrypt.compare(plainTxt, hash)
+  return bcrypt.compare(plainTxt, hash);
 }
 
-// export both functions
-module.exports = { hashThis, compareHash }
+module.exports = { hashThis, compareHash };

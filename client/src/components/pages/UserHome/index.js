@@ -1,3 +1,7 @@
+/**
+ * @module components.pages.UserHome.index
+ * @description Legacy page component module.
+ */
 import React, { Component } from 'react';
 import TextCard from '../../parts/TextCard';
 // import API from "../../../utils/API";

@@ -1,3 +1,7 @@
+/**
+ * @module components.parts.UsersList.index
+ * @description Reusable presentational UI part component.
+ */
 import React from 'react';
 import { Row, Col, Button } from "reactstrap";
 import TextCard from '../TextCard';

@@ -1,62 +1,74 @@
-// Dependencies
+/**
+ * @module server
+ * @description Express server bootstrap for API routes, auth cookies, CORS, and Vite static hosting.
+ */
+
+require("dotenv").config();
+
 const express = require("express");
-const router = require("express").Router();
-const mongoose = require("mongoose");
-const routes = require("./app/routes");
-const app = express();
 const path = require("path");
-const dotenv = require("dotenv");
-const PORT = process.env.PORT || 3001;
+const mongoose = require("mongoose");
+const cors = require("cors");
+const cookieParser = require("cookie-parser");
+const routes = require("./app/routes");
 
-// Configure dotenv to server to use .env files
-dotenv.config();
+const app = express();
+const PORT = Number(process.env.PORT) || 3001;
+const MONGODB_URI =
+  process.env.MONGODB_URI || "mongodb://localhost/mern_app-template-withauth";
+const CLIENT_ORIGIN = process.env.CLIENT_ORIGIN || "http://localhost:5173";
 
-// Use express
-app.use(express.urlencoded({ extended:true }));
 app.use(express.json());
-
-
-// Set express headers
-app.use(function(req, res, next) {
-    res.header("Access-Control-Allow-Origin", "*");
-    res.header("Access-Control-Allow-Methods", "GET,PUT,POST,DELETE");
-    res.header("Access-Control-Allow-Headers", "Origin, X-Requested-With, Content-Type, Accept");
-    next();
-});
-
-// if else statement stableizes deployment build to see pages and use backend routes.
-if (process.env.NODE_ENV === "production") {
-    // Have express use static assets from build
-    app.use(express.static("client/build"));
-    // Have express use routes defined in backend
-    app.use(routes);
-    // If no backend routes are hit send all requests for the frontend routes
-    app.get("/*", function(req, res) {
-      res.sendFile(path.join(__dirname, "./client/build/index.html"));
-    });
-}
-else {
-    // Have express use static assets from public folder
-    app.use(express.static(path.join(__dirname, '/client/public')));
-    // Have express use routes defined in backend
-    app.use(routes);
-    // If no backend routes are hit send all requests for the frontend routes
-    app.get("/*", function(req, res) {
-      res.sendFile(path.join(__dirname, "./client/public/index.html"));
-    });
-}
-
-// Connect to MongoDB
-// To make custom database just put the name you want for the db where 'mern_app-template-withauth' is.
-mongoose.connect(
-    process.env.MONGODB_URI || "mongodb://localhost/mern_app-template-withauth",
-    {
-        useCreateIndex: true,
-        useNewUrlParser: true,
-        useFindAndModify: false,
-        useUnifiedTopology: true
-    }
+app.use(express.urlencoded({ extended: true }));
+app.use(cookieParser());
+app.use(
+  cors({
+    origin: CLIENT_ORIGIN,
+    methods: ["GET", "POST", "PUT", "DELETE", "PATCH", "OPTIONS"],
+    allowedHeaders: [
+      "Origin",
+      "X-Requested-With",
+      "Content-Type",
+      "Accept",
+      "Authorization",
+    ],
+    credentials: true,
+  })
 );
 
-// Use express to start server
-app.listen(PORT, () => console.log("Server listening on: http://localhost:" + PORT));
+app.use(routes);
+
+if (process.env.NODE_ENV === "production") {
+  const clientDistPath = path.join(__dirname, "client", "dist");
+  app.use(express.static(clientDistPath));
+
+  app.get("*", (req, res) => {
+    res.sendFile(path.join(clientDistPath, "index.html"));
+  });
+} else {
+  app.get("/", (req, res) => {
+    res.send("API server running in development mode on port 3001.");
+  });
+}
+
+/**
+ * Connect to MongoDB and start the HTTP server.
+ * @returns {Promise<void>}
+ */
+async function startServer() {
+  try {
+    await mongoose.connect(MONGODB_URI);
+    console.log("Connected to MongoDB");
+
+    app.listen(PORT, () => {
+      console.log(`Server listening on http://localhost:${PORT}`);
+    });
+  } catch (error) {
+    console.error("MongoDB connection error:", error);
+    process.exit(1);
+  }
+}
+
+void startServer();
+
+module.exports = app;

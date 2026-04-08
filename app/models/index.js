@@ -1,4 +1,8 @@
+/**
+ * @module app/models
+ * @description Model registry for database collections.
+ */
+
 module.exports = {
-    // Serves as directory for schemas
-    User: require("./users")
+  User: require("./users"),
 };

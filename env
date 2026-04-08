@@ -1,0 +1,4 @@
+MONGODB_URI=mongodb://localhost/mern_app-template-withauth
+CLIENT_ORIGIN=http://localhost:3000
+JWT_SECRET=799557b5c3d7b5be8a3f92a5063b938d
+salt=12  # or your bcrypt salt rounds/string

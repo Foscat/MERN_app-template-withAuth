@@ -1,37 +1,38 @@
 {
   "name": "client",
   "version": "1.0.0",
-  "description": "client side of MERN app",
-  "dependencies": {
-    "axios": ">=0.18.1",
-    "react": "^16.6.3",
-    "react-bootstrap-sweetalert": "^4.4.1",
-    "react-dom": "^16.6.6",
-    "react-router-dom": "^4.3.1",
-    "react-scripts": "^3.0.1",
-    "reactstrap": "^7.1.0"
-  },
   "private": true,
-  "proxy": "http://localhost:3001",
-  "main": "index.js",
-  "scripts": {
-    "start": "react-scripts start",
-    "build": "react-scripts build",
-    "test": "react-scripts test --env=jsdom",
-    "eject": "react-scripts eject"
+  "engines": {
+    "node": "22.19.0"
   },
-  "author": "Foscat",
-  "license": "ISC",
-  "browserslist": {
-    "production": [
-      ">0.2%",
-      "not dead",
-      "not op_mini all"
-    ],
-    "development": [
-      "last 1 chrome version",
-      "last 1 firefox version",
-      "last 1 safari version"
-    ]
+  "scripts": {
+    "dev": "vite",
+    "build": "vite build",
+    "preview": "vite preview",
+    "test:unit": "vitest run",
+    "test:unit:watch": "vitest",
+    "test:snapshots": "playwright test -c playwright.config.js --update-snapshots",
+    "test:snapshots:verify": "playwright test -c playwright.config.js",
+    "test:snapshots:update": "playwright test -c playwright.config.js --update-snapshots"
+  },
+  "dependencies": {
+    "@rsuite/icons": "latest",
+    "axios": "latest",
+    "jwt-decode": "latest",
+    "mern_app-template-withauth-modern": "file:..",
+    "prop-types": "latest",
+    "react": "18.3.1",
+    "react-dom": "18.3.1",
+    "react-router-dom": "latest",
+    "rsuite": "latest"
+  },
+  "devDependencies": {
+    "@playwright/test": "^1.54.0",
+    "@testing-library/jest-dom": "^6.8.0",
+    "@testing-library/react": "^16.0.1",
+    "@vitejs/plugin-react": "latest",
+    "jsdom": "^26.1.0",
+    "vite": "latest",
+    "vitest": "^2.0.5"
   }
 }
