@@ -1,0 +1,43 @@
+.page-header {
+  padding: 40px 20px;
+  text-align: center;
+  margin-bottom: 40px;
+  border-radius: 24px;
+  -webkit-backdrop-filter: var(--backdrop-blur) saturate(180%);
+  backdrop-filter: var(--backdrop-blur) saturate(180%);
+  background: rgba(var(--white), 0.12);
+  box-shadow: 0 8px 32px rgba(var(--deep-black) 0.25);
+}
+
+.page-header-title {
+  font-size: 3rem;
+  margin: 0;
+  color: #fff;
+  text-shadow: 0 0 8px rgba(var(--white), 0.3);
+}
+
+.page-header-subtitle {
+  font-size: 1.5rem;
+  margin-top: 10px;
+  color: rgba(var(--white), 0.85);
+}
+
+.page-header .timespan {
+  opacity: 0.85;
+  font-style: italic;
+}
+
+/* Mobile responsive */
+@media (max-width: 600px) {
+  .page-header {
+    padding: 25px 15px;
+  }
+
+  .page-header-title {
+    font-size: 2.2rem;
+  }
+
+  .page-header-subtitle {
+    font-size: 1.2rem;
+  }
+}

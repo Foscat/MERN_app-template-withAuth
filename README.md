@@ -1,53 +1,195 @@
-# MERN_app-template-withAuth
-Boilerplate for full MERN stack apps that require security features.
+# MERN App Template With Auth
 
-### **Built using node version 11.2.0**
+Production-ready MERN starter with JWT access/refresh authentication, role support, protected frontend routes, and a modern React 18 + Vite + RSuite client.
 
-## Overview
-Full stack ready for deployment with built in CRUD functions and components.
-Made so the file structure is easy to follow and replicate to keep order as app increases in size.
-Comes with basic dependencies so developers can choose to add redux or other depencies on top off it. But allows for devs to have more choce on how app is built. This version comes with jsonwebtoken and bcrypt for hashing and authentication.
+## Highlights
 
-**__Site is deployment ready out of the box__**
+- Express API with modular routes, controllers, middleware, and Mongoose models
+- JWT access tokens + HTTP-only refresh cookie flow
+- Automatic frontend token refresh and session expiry handling
+- Protected React routes and dashboard layout scaffolding
+- Node version pinned to `v22.19.0`
+- JSDoc-first code comments aligned for `jsdoc2md` generation
 
-## How to use it
-Clone repo as local file refrence then copy files into your project. Then on server.js level open terminal and type *npm install* this will install backend dependencies and then it auto switches to client side and installs dependencies.
+## Tech Stack
 
-Once dependencies are installed type *npm start* in termial. This will start the server then swithc to client and boot it. It will open up tab in your default browser.
+- Backend: Node.js, Express, Mongoose, JWT, bcrypt, cookie-parser, cors
+- Frontend: React 18, React Router, Vite, RSuite, Axios
+- Tooling: Nodemon, Concurrently, jsdoc-to-markdown
 
-**Be sure to link DB with mlab or other extension**
+## Prerequisites
 
-### Easy to build on top of
-* File structure designed to make large scale projects in organized way.
-* index.js files in folders to serve as directory routes for files in folder
-* Built in CRUD functions with custom error handeling and front end components as working example to copy and re-use
-* Comes with Bootstrap as cdn so it is easy use and replace
+- Node.js `22.19.0`
+- npm `10+`
+- MongoDB (local or hosted)
 
-### Dependencies 
+Use the included version files with your version manager:
 
-**Back End**
-- Concurrently - Allows package JSON scripts to handle multiple commands
-- Nodemon - For when you are in development any save will refresh server to give live update of changes
-- Axios - For communicating with front end
-- Express - For helping build a server and serving assests
-- Mongoose - Helps with orm for mongodb
-- Prop-types - Helps react with hanldeing props
-- React - To let app work in a react environment
-- If-env - Has app check for env
-- Dotenv - Allows .env files to be used in app. 
-- Bcrypt - For encrypting data
-- Jsonwebtoken - For handleing authorization
-- Kind-of - Manual update for dependencies
-- Minimist - Manual update for dependencies
+- `.nvmrc`
+- `.node-version`
+- `client/.nvmrc`
+- `client/.node-version`
 
-**Front End**
-- Axios - For communicating with back end routes
-- React - To let app work in a react environment
-- React-bootstrap-sweetalert - For easy to use models
-- React-dom - Needed for react to work with DOM
-- React-router-dom - Needed for using a react component router
-- React-scripts - Needed for react to work
-- Reactstrap - Special components made just for react
-- Moment - For easy formatting of dates
+## Quick Start
 
-See a working delpoyed version here: https://arcane-beach-57949.herokuapp.com/
+1. Install backend dependencies:
+   ```bash
+   npm install
+   ```
+2. Install frontend dependencies:
+   ```bash
+   npm install --prefix client
+   ```
+3. Configure environment variables (see below).
+4. Start the app in development mode:
+   ```bash
+   npm run start
+   ```
+
+Backend runs on `http://localhost:3001` and Vite dev server on `http://localhost:5173`.
+
+## Environment Variables
+
+Create a root `.env` file for backend config.
+
+| Variable | Required | Default | Purpose |
+|---|---|---|---|
+| `PORT` | No | `3001` | API server port |
+| `MONGODB_URI` | No | `mongodb://localhost/mern_app-template-withauth` | MongoDB connection string |
+| `CLIENT_ORIGIN` | No | `http://localhost:5173` | Allowed CORS origin |
+| `JWT_ACCESS_SECRET` | Yes | none | Secret for access token signing |
+| `JWT_REFRESH_SECRET` | Yes | none | Secret for refresh token signing |
+| `ACCESS_TOKEN_EXPIRES_IN` | No | `15m` | Access token TTL |
+| `REFRESH_TOKEN_EXPIRES_IN` | No | `7d` | Refresh token TTL |
+| `salt` | Yes | none | bcrypt salt rounds or salt value |
+
+Client env is optional in current code. If needed, use `client/.env`:
+
+```env
+VITE_API_URL=/api
+```
+
+## Available Scripts
+
+### Root Scripts
+
+| Command | Description |
+|---|---|
+| `npm run start` | Auto-selects dev/prod mode based on `NODE_ENV` |
+| `npm run start:dev` | Runs API via Nodemon + Vite dev server concurrently |
+| `npm run start:prod` | Runs API server only (for built client assets) |
+| `npm run build` | Builds the Vite client to `client/dist` |
+| `npm run docs:api` | Generates API docs from JSDoc comments |
+
+### Client Scripts
+
+| Command | Description |
+|---|---|
+| `npm run dev --prefix client` | Starts Vite dev server |
+| `npm run build --prefix client` | Builds frontend assets |
+| `npm run preview --prefix client` | Previews built frontend |
+| `npm run test:unit --prefix client` | Runs Vitest unit tests |
+| `npm run test:snapshots --prefix client` | Runs Playwright snapshots in update mode (local baseline generation) |
+| `npm run test:snapshots:verify --prefix client` | Verifies existing Playwright snapshot baselines |
+
+## Authentication Flow
+
+1. `POST /api/users/login` or `POST /api/users/register` returns an access token.
+2. Refresh token is set as `HttpOnly` cookie on `/api/users` path.
+3. Frontend sends access token in `Authorization: Bearer <token>`.
+4. On `401`, Axios interceptor attempts `POST /api/users/refresh`.
+5. If refresh succeeds, request is retried automatically.
+6. If refresh fails, session is cleared and user is redirected to `/login`.
+
+## API Endpoints
+
+| Method | Route | Description |
+|---|---|---|
+| `POST` | `/api/users/register` | Register user |
+| `POST` | `/api/users/login` | Login user |
+| `POST` | `/api/users/refresh` | Rotate refresh cookie and issue access token |
+| `POST` | `/api/users/logout` | Clear refresh cookie |
+| `GET` | `/api/users/current` | Get current authenticated user |
+| `GET` | `/api/users` | List users |
+| `POST` | `/api/users` | Create user (register alias) |
+| `GET` | `/api/users/:id` | Fetch user by id |
+| `PUT` | `/api/users/:id` | Update user |
+| `DELETE` | `/api/users/:id` | Delete user |
+
+## Dynamic Documentation (JSDoc + jsdoc2md)
+
+This repository is configured for generated API docs.
+
+- Output file: `docs/api-reference.md`
+- Generation command:
+
+```bash
+npm run docs:api
+```
+
+The script scans:
+
+- `server.js`
+- `app/**/*.js`
+- `client/src/api/**/*.js`
+
+This keeps output stable and avoids JSX parser noise while still documenting the API surface.
+
+## Snapshot Policy
+
+Playwright snapshot image baselines are intentionally gitignored in this boilerplate to avoid committing large, platform-specific PNG artifacts by default.
+
+- Generate/update local baselines with:
+  ```bash
+  npm run test:snapshots
+  ```
+- Verify existing baselines with:
+  ```bash
+  npm run test:snapshots:verify
+  ```
+
+## Project Structure
+
+```text
+app/
+  controllers/
+  middleware/
+  models/
+  routes/
+client/
+  src/
+    api/
+    components/
+    context/
+    layouts/
+    pages/
+server.js
+docs/
+```
+
+## Production Notes
+
+- Build client before production server start:
+  ```bash
+  npm run build
+  ```
+- Start API in production mode:
+  ```bash
+  # macOS/Linux
+  NODE_ENV=production npm run start:prod
+
+  # PowerShell
+  $env:NODE_ENV='production'; npm run start:prod
+  ```
+- In production, Express serves `client/dist` as static assets.
+- Set secure, unique JWT secrets and a production MongoDB URI.
+
+## Troubleshooting
+
+- `401` loops on authenticated routes:
+  - Verify `JWT_ACCESS_SECRET` and `JWT_REFRESH_SECRET` match issued tokens.
+  - Confirm browser accepts cookies for backend origin and `withCredentials` requests.
+- CORS errors:
+  - Ensure `CLIENT_ORIGIN` exactly matches frontend origin.
+- MongoDB connection failure:
+  - Validate `MONGODB_URI` and network/IP access rules.

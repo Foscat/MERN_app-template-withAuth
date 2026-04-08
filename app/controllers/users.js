@@ -1,166 +1,339 @@
+/**
+ * @module app/controllers/users
+ * @description User authentication and CRUD controller methods.
+ */
+
 const db = require("../models");
 const jwt = require("jsonwebtoken");
 const moment = require("moment");
 const hash = require("./hash");
-const mailformat = /^\w+([\.-]?\w+)*@\w+([\.-]?\w+)*(\.\w{2,3})+$/;
 
-// Defining methods for the userController
+/**
+ * @typedef {Object} AuthenticatedRequest
+ * @property {Object} [user] - Authenticated token payload.
+ * @property {string} [user.id] - User id.
+ * @property {string} [user.email] - User email.
+ * @property {string} [user.role] - User role.
+ */
+
+/**
+ * @typedef {{ id: string, email: string, role: string }} TokenPayload
+ */
+
+const EMAIL_FORMAT = /^\w+([\.-]?\w+)*@\w+([\.-]?\w+)*(\.\w{2,3})+$/;
+
+/**
+ * Sign a short-lived JWT access token.
+ * @param {TokenPayload} payload - Claims to include in the token.
+ * @returns {string} Signed access token.
+ */
+function signAccessToken(payload) {
+  return jwt.sign(payload, process.env.JWT_ACCESS_SECRET, {
+    expiresIn: process.env.ACCESS_TOKEN_EXPIRES_IN || "15m",
+  });
+}
+
+/**
+ * Sign a long-lived JWT refresh token.
+ * @param {TokenPayload} payload - Claims to include in the token.
+ * @returns {string} Signed refresh token.
+ */
+function signRefreshToken(payload) {
+  return jwt.sign(payload, process.env.JWT_REFRESH_SECRET, {
+    expiresIn: process.env.REFRESH_TOKEN_EXPIRES_IN || "7d",
+  });
+}
+
+/**
+ * Attach refresh token as an HTTP-only cookie.
+ * @param {Object} res - Express response.
+ * @param {string} token - Refresh token value.
+ * @returns {void}
+ */
+function setRefreshCookie(res, token) {
+  res.cookie("refreshToken", token, {
+    httpOnly: true,
+    secure: process.env.NODE_ENV === "production",
+    sameSite: "strict",
+    path: "/api/users",
+  });
+}
+
+/**
+ * Build token payload from a user record.
+ * @param {{ _id: string, email: string, role: string }} user - User document.
+ * @returns {TokenPayload} Token claims.
+ */
+function buildPayload(user) {
+  return {
+    id: String(user._id),
+    email: user.email,
+    role: user.role,
+  };
+}
+
+/**
+ * Return all users matching query params.
+ * @param {Object} req - Express request.
+ * @param {Object} res - Express response.
+ * @returns {Promise<void>}
+ */
+async function findAll(req, res) {
+  try {
+    const users = await db.User.find(req.query);
+    res.json(users);
+  } catch (error) {
+    res.status(422).json(error);
+  }
+}
+
+/**
+ * Return a user by id.
+ * @param {Object} req - Express request.
+ * @param {Object} res - Express response.
+ * @returns {Promise<void>}
+ */
+async function findById(req, res) {
+  try {
+    const user = await db.User.findById(req.params.id);
+
+    if (!user) {
+      res.status(404).json({ message: "User not found" });
+      return;
+    }
+
+    res.json(user);
+  } catch (error) {
+    res.status(422).json(error);
+  }
+}
+
+/**
+ * Register a new user and return an access token.
+ * @param {Object} req - Express request.
+ * @param {Object} res - Express response.
+ * @returns {Promise<void>}
+ */
+async function register(req, res) {
+  try {
+    const { name, username, email, password, phone_num, role } = req.body;
+
+    if (!email || !password || !name || !username) {
+      res
+        .status(400)
+        .json({ message: "name, username, email, and password are required" });
+      return;
+    }
+
+    if (!EMAIL_FORMAT.test(email)) {
+      res.status(400).json({ message: "Invalid email format" });
+      return;
+    }
+
+    const existing = await db.User.findOne({ email });
+    if (existing) {
+      res.status(409).json({ message: "Email already in use" });
+      return;
+    }
+
+    const user = await db.User.create({
+      name,
+      username,
+      email,
+      password: hash.hashThis(password),
+      phone_num,
+      role: role || "user",
+      createdAt: moment().format("dddd, MMMM Do YYYY, h:mm:ss a"),
+    });
+
+    const payload = buildPayload(user);
+    const accessToken = signAccessToken(payload);
+    const refreshToken = signRefreshToken(payload);
+
+    setRefreshCookie(res, refreshToken);
+    res.status(201).json({ token: accessToken });
+  } catch (error) {
+    console.error("Register error:", error);
+    res.status(500).json({ message: "Registration failed" });
+  }
+}
+
+/**
+ * Legacy alias for register endpoint behavior.
+ * @param {Object} req - Express request.
+ * @param {Object} res - Express response.
+ * @returns {Promise<void>}
+ */
+function create(req, res) {
+  return register(req, res);
+}
+
+/**
+ * Update a user by id.
+ * @param {Object} req - Express request.
+ * @param {Object} res - Express response.
+ * @returns {Promise<void>}
+ */
+async function update(req, res) {
+  try {
+    const { password, ...rest } = req.body;
+    const updateData = { ...rest };
+
+    if (password) {
+      updateData.password = hash.hashThis(password);
+    }
+
+    updateData.updatedAt = moment().format("dddd, MMMM Do YYYY, h:mm:ss a");
+
+    const user = await db.User.findByIdAndUpdate(req.params.id, updateData, {
+      new: true,
+    });
+
+    if (!user) {
+      res.status(404).json({ message: "User not found" });
+      return;
+    }
+
+    res.json(user);
+  } catch (error) {
+    console.error("Update user error:", error);
+    res.status(500).json({ message: "Update failed" });
+  }
+}
+
+/**
+ * Delete a user by id.
+ * @param {Object} req - Express request.
+ * @param {Object} res - Express response.
+ * @returns {Promise<void>}
+ */
+async function remove(req, res) {
+  try {
+    const user = await db.User.findById(req.params.id);
+
+    if (!user) {
+      res.status(404).json({ message: "User not found" });
+      return;
+    }
+
+    await user.remove();
+    res.json(user);
+  } catch (error) {
+    console.error("Remove user error:", error);
+    res.status(500).json({ message: "Delete failed" });
+  }
+}
+
+/**
+ * Authenticate a user and return an access token.
+ * @param {Object} req - Express request.
+ * @param {Object} res - Express response.
+ * @returns {Promise<void>}
+ */
+async function login(req, res) {
+  try {
+    const { email, password } = req.body;
+
+    if (!email || !password) {
+      res.status(400).json({ message: "Email and password are required" });
+      return;
+    }
+
+    const user = await db.User.findOne({ email });
+
+    if (!user) {
+      res.status(401).json({ message: "Invalid credentials" });
+      return;
+    }
+
+    const isMatch = await hash.compareHash(password, user.password);
+
+    if (!isMatch) {
+      res.status(401).json({ message: "Invalid credentials" });
+      return;
+    }
+
+    const payload = buildPayload(user);
+    const accessToken = signAccessToken(payload);
+    const refreshToken = signRefreshToken(payload);
+
+    setRefreshCookie(res, refreshToken);
+    res.json({ token: accessToken });
+  } catch (error) {
+    console.error("Login error:", error);
+    res.status(500).json({ message: "Login failed" });
+  }
+}
+
+/**
+ * Refresh the access token using the refresh cookie.
+ * @param {Object} req - Express request.
+ * @param {Object} res - Express response.
+ * @returns {void}
+ */
+function refreshToken(req, res) {
+  const token = req.cookies.refreshToken;
+
+  if (!token) {
+    res.status(401).json({ message: "No refresh token" });
+    return;
+  }
+
+  try {
+    const decoded = jwt.verify(token, process.env.JWT_REFRESH_SECRET);
+    const payload = {
+      id: decoded.id,
+      email: decoded.email,
+      role: decoded.role,
+    };
+
+    const accessToken = signAccessToken(payload);
+    const newRefreshToken = signRefreshToken(payload);
+
+    setRefreshCookie(res, newRefreshToken);
+    res.json({ token: accessToken });
+  } catch (error) {
+    console.error("Refresh error:", error);
+    res.status(403).json({ message: "Invalid refresh token" });
+  }
+}
+
+/**
+ * Clear the refresh token cookie.
+ * @param {Object} req - Express request.
+ * @param {Object} res - Express response.
+ * @returns {void}
+ */
+function logout(req, res) {
+  res.clearCookie("refreshToken", { path: "/api/users" });
+  res.status(200).json({ message: "Logged out" });
+}
+
+/**
+ * Return the currently authenticated user payload from middleware.
+ * @param {AuthenticatedRequest} req - Express request.
+ * @param {Object} res - Express response.
+ * @returns {void}
+ */
+function currentUser(req, res) {
+  if (!req.user) {
+    res.status(401).json({ message: "Not authenticated" });
+    return;
+  }
+
+  res.json({ user: req.user });
+}
+
 module.exports = {
-  findAll: function(req, res) {
-    console.log("Find all users request.");
-    db.User.find(req.query)
-      .then(dbUser => res.json(dbUser))
-      .catch(err => res.status(422).json(err));
-  },
-  findById: function(req, res) {
-    console.log("Find user by id request.");
-    // If a request parameter has an id search db 
-    if(req.params.id){
-      console.log(`Find by id ${req.params.id}`)
-      db.User.findById(req.params.id)
-      .then(dbUser => res.json(dbUser))
-      .catch(err => res.status(422).json(err));
-    }
-    // If no id present return custom error
-    else{
-      console.log("findById error");
-      res.send({
-        message: "There is no id present in your request.",
-        info: {givenId: req.params.id}
-      })
-    }
-  },
-  create: function(req, res) {
-    console.log("Create user request.");
-    // Check to see request actually has a body with values
-    if(Object.keys(req.body).length){
-      if(!req.body.email.match(mailformat)) res.send({
-        message: "Email format is not correct.", 
-        info: req.body
-      })
-
-      // Use the backend runtime to handle created at timestamp
-      Object.assign(req.body, {createdAt: moment().format("dddd, MMMM Do YYYY, h:mm:ss a")});
-
-      // Hash the password and make the info to be saved to be the hashed version
-      let hashPw = hash.hashThis(req.body.password);
-      req.body.password = hashPw;
-
-      //  If the phone number comes in as a type of string convert it into a number before sending to db
-      if(typeof req.body.phone_num === typeof ""){
-        req.body.phone_num = parseInt(req.body.phone_num);
-        db.User.create(req.body)
-        .then(dbUser => res.json(dbUser))
-        .catch(err => res.status(422).json(err));
-      }
-      // If all information is correct send data to db
-      else{
-        db.User.create(req.body)
-        .then(dbUser => res.json(dbUser))
-        .catch(err => res.status(422).json(err));
-      }
-    }
-    // If there is not values in request body send custom error
-    else{
-      res.send({
-        message: "There is no data in request body.",
-        info: {
-          givenData: req.body
-        }
-      });
-    }
-  },
-  update: function(req, res) {
-    console.log("Update user request.")
-    // If the request does not have an id param or request body return a custom error
-    if(!req.params.id || req.body === {}){
-      console.log("Missing data in user update request.");
-      res.send({
-        message: "There is missing data in your request.",
-        info: {
-          givenId: req.params.id,
-          givenData: req.body
-        }
-      })
-    }
-    else{
-      // Use the backend runtime to handle updatedAt timestamp
-      Object.assign(req.body, {updatedAt: moment().format("dddd, MMMM Do YYYY, h:mm:ss a")});
-
-      console.log("Find one user and update request.", req.params.id, req.body);
-      db.User.findOneAndUpdate({ _id: req.params.id }, req.body)
-      .catch(err => res.send({message:"findOneAndUpdate hit an error", info:err}))
-      .then(dbUser => (res.json(dbUser)))
-      .catch(err => res.status(422).json(err));
-    }
-  },
-  remove: function(req, res) {
-    console.log("Remove user request.");
-    // If a id is present then run delete
-    if(req.params.id){
-      db.User.findById(req.params.id)
-      .then(dbUser => dbUser.remove())
-      .catch(err =>  res.send({
-        message: "The id submitted does not match with any in db.", 
-        data:{givenId:req.params.id}
-      }))
-      .then(dbUser => res.json(dbUser))
-      .catch(err => res.status(422).json(err));
-    }
-    // Otherwise return custom error
-    else{
-      res.send({
-        message: "There is no id present in your request.",
-        info: {givenId: req.params.id}
-      })
-    }
-  },
-  currentUser: function(req,res){
-    console.log("Authenticate user request");
-
-    var token = req.body.token;
-    // console.log("currentUser token:",token);
-
-    //decode token
-    var decoded = jwt.decode(token)
-    // console.log("currentUser decoded:",decoded);
-
-    //if data exists, return user data
-    if (decoded.data) {
-      db.User.find({ _id: decoded.data }).then(function(data, err) {
-        if (err) throw res.json(err);
-        console.log("currentUser() find() decoded._id data:",data);
-        res.json(data);
-      });
-    }
-    //if data can not be extracted, return redirect command
-    else {
-      console.error("No user by that id found");
-      res.json("redirect");
-    }
-  },
-  signInUser: function(req,res){
-    console.log("Sign in user request.");
-
-    //hash pw
-    var hashedInput = hash.hashThis(req.body.password);
-    // console.log("hashedInput:", hashedInput);
-
-    db.User.find({username: req.body.username})
-      .then((data,err) => {
-        // console.log("Found one", data, err);
-        if(err)res.send({message:"There was an error", info:err});
-        if(Object.keys(data).length <= 0)res.send({message:"There is no data in response.", info:data});
-        if(hashedInput === data[0].password){
-          console.log("Hash and password match");
-          // Generate token
-          let token = jwt.sign({data: data[0]._id}, "secret");
-          // console.log("jwt token:", token);
-          res.send({message:"Token recived", info:token, user: data})
-        }
-        else res.send({message:"Something went wrong.", info:{dataObj:data, errObj:err}})
-      })
-      .catch(err => res.send({message:"A user was not found by that name.", info: err}));
-  },
-  
+  findAll,
+  findById,
+  register,
+  create,
+  update,
+  remove,
+  login,
+  refreshToken,
+  logout,
+  currentUser,
 };
+
