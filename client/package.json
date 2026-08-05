@@ -33,6 +33,6 @@
     "@vitejs/plugin-react": "latest",
     "jsdom": "^26.1.0",
     "vite": "latest",
-    "vitest": "^2.0.5"
+    "vitest": "^3.2.6"
   }
 }
