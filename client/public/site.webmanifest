@@ -1,0 +1,23 @@
+{
+  "name": "MERN Forge",
+  "short_name": "MERN Forge",
+  "description": "Secure MERN application starter with configurable semantic UI.",
+  "icons": [
+    {
+      "src": "/images/android-chrome-192x192.png",
+      "sizes": "192x192",
+      "type": "image/png",
+      "purpose": "any maskable"
+    },
+    {
+      "src": "/images/android-chrome-512x512.png",
+      "sizes": "512x512",
+      "type": "image/png",
+      "purpose": "any maskable"
+    }
+  ],
+  "theme_color": "#07111f",
+  "background_color": "#07111f",
+  "display": "standalone",
+  "start_url": "/"
+}

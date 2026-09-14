@@ -56,6 +56,21 @@ typings/
 
 # dotenv environment variables file
 .env
+.env.*
+!.env.example
+env
+client/env
+
+# Operating-system metadata
+desktop.ini
+
+# Compiled and browser-test output
+client/dist/
+client/dist-ssr/
+client/playwright-report/
+client/test-results/
+.playwright-cli/
+output/playwright/
 
 # next.js build output
 .next

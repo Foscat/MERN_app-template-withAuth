@@ -1,0 +1,58 @@
+name: CI
+
+on:
+  pull_request:
+  push:
+    branches: [master]
+
+permissions:
+  contents: read
+
+concurrency:
+  group: ci-${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  verify:
+    runs-on: ubuntu-latest
+    services:
+      mongo:
+        image: mongo:8.2
+        ports: ["27017:27017"]
+      redis:
+        image: redis:8-alpine
+        ports: ["6379:6379"]
+    env:
+      TEST_MONGODB_URI: mongodb://127.0.0.1:27017/template_ci
+      TEST_REDIS_URL: redis://127.0.0.1:6379
+    timeout-minutes: 20
+    steps:
+      - name: Check out repository
+        uses: actions/checkout@v7
+
+      - name: Set up Node.js
+        uses: actions/setup-node@v7
+        with:
+          node-version: 22.19.0
+          cache: npm
+          cache-dependency-path: |
+            package-lock.json
+            client/package-lock.json
+
+      - name: Install server dependencies
+        run: npm ci
+
+      - name: Install client dependencies
+        run: npm ci --prefix client
+
+      - name: Verify source, tests, build, docs, and production audits
+        run: npm run verify:ci
+
+      - name: Install Chromium
+        working-directory: client
+        run: npx playwright install --with-deps chromium
+
+      - name: Run browser smoke tests
+        run: npm --prefix client run test:e2e
+      - name: Verify real shared infrastructure and crawlable HTML
+        run: npm run test:multi-instance && npm run test:seo

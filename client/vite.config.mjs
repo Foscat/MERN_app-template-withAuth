@@ -1,3 +1,8 @@
+/**
+ * @module client/vite.config
+ * @description Vite development, build, and API-proxy configuration.
+ */
+
 import { defineConfig } from "vite";
 import react from "@vitejs/plugin-react";
 
@@ -7,8 +12,8 @@ export default defineConfig({
     proxy: {
       "/api": {
         target: "http://localhost:3001",
-        changeOrigin: true
-      }
-    }
-  }
+        changeOrigin: true,
+      },
+    },
+  },
 });
