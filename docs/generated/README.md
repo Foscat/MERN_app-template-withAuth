@@ -4,7 +4,7 @@
 
 JSDoc is rendered into one Markdown page per source module so reviews and drift checks remain focused.
 
-- [Backend API reference](backend/README.md) (13 modules)
-- [Client reference](client/README.md) (23 modules)
+- [Backend API reference](backend/README.md) (35 modules)
+- [Client reference](client/README.md) (38 modules)
 
 Run `npm run docs:generate` to rebuild these files or `npm run docs:check` to verify them without writing.

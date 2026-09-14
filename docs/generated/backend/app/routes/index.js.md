@@ -7,11 +7,4 @@
 <a name="module_app/routes"></a>
 
 ## app/routes
-Root router that mounts all API route groups.
-
-<a name="module_app/routes..router"></a>
-
-### app/routes~router
-Express router for application endpoints. @type {Object}
-
-**Kind**: inner constant of [<code>app/routes</code>](#module_app/routes)
+Named public exports for this backend module group. Internal siblings import directly to avoid barrel cycles.

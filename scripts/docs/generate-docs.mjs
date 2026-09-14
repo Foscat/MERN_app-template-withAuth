@@ -91,7 +91,7 @@ async function walkJavaScriptFiles(directory) {
 
     if (entry.isDirectory()) {
       files.push(...(await walkJavaScriptFiles(entryPath)));
-    } else if (/\.(?:js|jsx)$/.test(entry.name)) {
+    } else if (/\.(?:js|jsx|cjs|mjs)$/.test(entry.name)) {
       files.push(entryPath);
     }
   }
@@ -108,7 +108,7 @@ async function walkJavaScriptFiles(directory) {
 function isTestSource(relativePath) {
   return (
     /(?:^|\/)(?:test|tests|__tests__)(?:\/|$)/.test(relativePath) ||
-    /\.(?:test|spec)\.(?:js|jsx)$/.test(relativePath)
+    /\.(?:test|spec)\.(?:js|jsx|cjs|mjs)$/.test(relativePath)
   );
 }
 
@@ -130,6 +130,8 @@ export async function discoverDocumentationModules(rootDir) {
   sourcePaths.push(
     ...(await walkJavaScriptFiles(path.join(absoluteRoot, "app"))),
     ...(await walkJavaScriptFiles(path.join(absoluteRoot, "client", "src"))),
+    ...(await walkJavaScriptFiles(path.join(absoluteRoot, "shared"))),
+    ...(await walkJavaScriptFiles(path.join(absoluteRoot, "scripts"))),
   );
 
   return sourcePaths
@@ -158,7 +160,7 @@ export async function discoverDocumentationModules(rootDir) {
  * @returns {Promise<string>} Rendered Markdown.
  */
 async function renderJSDocSource(sourcePath) {
-  return jsdoc2md.render({ files: sourcePath });
+  return jsdoc2md.render({ source: await readFile(sourcePath, "utf8") });
 }
 
 /**
@@ -244,7 +246,7 @@ function renderRootIndex(backendCount, clientCount) {
  *
  * @param {Object} options Generator options.
  * @param {string} options.rootDir Absolute repository root.
- * @param {(sourcePath: string) => Promise<string>} [options.renderSource] JSDoc renderer override.
+ * @param {function(string): Promise<string>} [options.renderSource] JSDoc renderer override.
  * @returns {Promise<Map<string, string>>} Repository-relative output paths and contents.
  */
 export async function createDocumentationPlan({

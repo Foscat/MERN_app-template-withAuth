@@ -25,7 +25,7 @@ module.exports = defineConfig({
     timezoneId: "America/Chicago",
   },
   webServer: {
-    command: "npm run dev -- --host 127.0.0.1 --port 4173",
+    command: "node node_modules/vite/bin/vite.js --host 127.0.0.1 --port 4173",
     url: "http://127.0.0.1:4173",
     timeout: 120_000,
     reuseExistingServer: !process.env.CI,

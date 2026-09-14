@@ -2,6 +2,10 @@
 
 This guide explains how to deploy this MERN template to production.
 
+Before configuring a provider, read [scaling and operations](docs/scaling-and-operations.md) for deployment mode, shared stores, health probes, index creation, and the session cutover. Follow the [SEO publishing checklist](docs/seo-guide.md) before enabling indexing. Production requires an explicit `DEPLOYMENT_MODE=single` or `multi`; multi-instance deployments require Redis.
+
+> **Important:** The repository includes friction-free local development defaults. Replace every starter credential, local infrastructure URL, browser origin, and provider-specific setting before deployment. Production mode rejects missing JWT secrets and the built-in development signing keys.
+
 It covers:
 
 - Render
@@ -28,10 +32,14 @@ Set these on your hosting platform:
 | Variable                    | Required    | Example                         | Notes                                           |
 | --------------------------- | ----------- | ------------------------------- | ----------------------------------------------- |
 | `NODE_ENV`                  | Yes         | `production`                    | Must be `production` in deployed environments   |
+| `DEPLOYMENT_MODE`           | Yes         | `single` or `multi`             | Explicit topology; multi requires shared Redis  |
 | `PORT`                      | No          | `3001`                          | Platform usually injects this automatically     |
 | `MONGODB_URI`               | Yes         | `mongodb+srv://...`             | Use MongoDB Atlas or managed Mongo              |
 | `CLIENT_ORIGINS`            | Usually Yes | `https://your-app.onrender.com` | Comma-separated exact browser origins           |
 | `TRUST_PROXY`               | Platform    | `1`                             | Use the provider's documented proxy-hop setting |
+| `RATE_LIMIT_STORE`          | Multi-node  | `redis`                         | Select shared quotas instead of process memory  |
+| `RATE_LIMIT_REDIS_URL`      | With Redis  | `rediss://...`                  | Managed Redis/Valkey connection URL             |
+| `RATE_LIMIT_REDIS_PREFIX`   | No          | deployment-specific value       | Shared by instances, unique per app/environment |
 | `JWT_ACCESS_SECRET`         | Yes         | random 32+ chars                | Unique access-token signing secret              |
 | `JWT_REFRESH_SECRET`        | Yes         | different random 32+ chars      | Unique refresh-token signing secret             |
 | `JWT_ISSUER`                | No          | `mern-app-template`             | Token issuer checked during verification        |
@@ -60,7 +68,8 @@ PowerShell local production smoke test:
 
 ```powershell
 $env:NODE_ENV='production'
-npm start
+$env:DEPLOYMENT_MODE='single'
+npm run start:prod
 ```
 
 ## Render
@@ -78,7 +87,7 @@ npm ci && npm ci --prefix client && npm run build
 - Start command:
 
 ```bash
-npm start
+npm run start:prod
 ```
 
 - Auto deploy: enabled
@@ -99,7 +108,7 @@ npm ci && npm ci --prefix client && npm run build
 Run command:
 
 ```bash
-npm start
+npm run start:prod
 ```
 
 Set environment secrets in Replit:
@@ -122,6 +131,7 @@ Set config vars:
 
 ```bash
 heroku config:set NODE_ENV=production
+heroku config:set DEPLOYMENT_MODE=single
 heroku config:set MONGODB_URI="..."
 heroku config:set CLIENT_ORIGINS="https://<your-app-name>.herokuapp.com"
 heroku config:set JWT_ACCESS_SECRET="..."
@@ -156,7 +166,7 @@ npm ci && npm ci --prefix client && npm run build
 - Start command:
 
 ```bash
-npm start
+npm run start:prod
 ```
 
 Set required variables in Railway dashboard, including `NODE_ENV=production`.
@@ -169,14 +179,14 @@ Typical command flow:
 
 ```bash
 fly launch
-fly secrets set NODE_ENV=production MONGODB_URI="..." CLIENT_ORIGINS="https://<app>.fly.dev" JWT_ACCESS_SECRET="..." JWT_REFRESH_SECRET="..." BCRYPT_ROUNDS="12"
+fly secrets set NODE_ENV=production DEPLOYMENT_MODE=single MONGODB_URI="..." CLIENT_ORIGINS="https://<app>.fly.dev" JWT_ACCESS_SECRET="..." JWT_REFRESH_SECRET="..." BCRYPT_ROUNDS="12"
 fly deploy
 ```
 
 In your Fly config, ensure build/start equivalents run:
 
 - build: `npm ci && npm ci --prefix client && npm run build`
-- start: `npm start`
+- start: `npm run start:prod`
 
 ## Vercel / Netlify Notes
 
@@ -199,7 +209,20 @@ After deployment:
 
 ## Scaling and Operations
 
-- The included rate limiter uses its in-process store. Configure an `express-rate-limit` compatible shared store before running multiple application instances.
+- A single instance can retain `RATE_LIMIT_STORE=memory` without another service.
+- Before running multiple application instances, provision managed Redis or Valkey and give every instance the same settings:
+
+  ```dotenv
+  DEPLOYMENT_MODE=multi
+  RATE_LIMIT_STORE=redis
+  RATE_LIMIT_REDIS_URL=rediss://<managed-connection-url>
+  RATE_LIMIT_REDIS_PREFIX=<unique-app-and-environment-name>
+  ```
+
+- Use the provider's private/internal connection URL where available. Prefer `rediss://` whenever traffic crosses an untrusted network, and store the URL as a secret because it commonly contains credentials.
+- Keep `RATE_LIMIT_REDIS_PREFIX` identical across every instance of one deployment, but unique across applications and environments that share the same Redis/Valkey service. The app adds separate `api` and `auth` namespaces automatically.
+- Redis mode validates and connects the shared store before MongoDB or the HTTP listener starts. An invalid URL or unavailable store therefore fails startup instead of silently falling back to per-process counters.
+- Runtime store errors fail closed through the API error boundary. Monitor Redis/Valkey availability and latency as part of the application service-level checks.
 - Keep TLS termination, `TRUST_PROXY`, and `CLIENT_ORIGINS` aligned with the hosting provider's network topology.
 - Enable managed database backups, centralized structured logging, uptime checks against `/api/health`, and secret rotation in the deployment platform.
 - Treat a signing secret as compromised if it was ever committed or exposed; replace it in every deployed environment rather than only deleting the current file.

@@ -1,6 +1,8 @@
 # MERN App Template With Auth
 
-Production-ready MERN starter with JWT access/refresh authentication, role support, protected frontend routes, and a modern React 18 + Vite client using a semantic Bento UI system.
+Extensible MERN starter with independent device sessions, role support, protected frontend routes, and a React 18 + Vite client using a configurable semantic UI system.
+
+Start with the [extension and onboarding guide](docs/extending-the-template.md), [scaling and operations guide](docs/scaling-and-operations.md), and [SEO configuration guide](docs/seo-guide.md). Production readiness requires your infrastructure configuration and deployment verification.
 
 ## Highlights
 
@@ -8,7 +10,7 @@ Production-ready MERN starter with JWT access/refresh authentication, role suppo
 - JWT access tokens + HTTP-only refresh cookie flow
 - Automatic frontend token refresh and session expiry handling
 - Protected React routes and dashboard layout scaffolding
-- Bento UI with the Service Blue + Red theme and dark mode by default
+- Configurable UI Style Kit presets with a Service Blue + Red theme and browser-native mode by default
 - `layout-style-css` structure, `ui-style-kit-css` paint, and `interactive-surface-css` states
 - Node 22 runtime contract (`>=22.19.0 <23`)
 - JSDoc-first code comments with granular `jsdoc2md` generation and drift checks
@@ -43,34 +45,40 @@ Use the included version files with your version manager:
    ```bash
    npm ci --prefix client
    ```
-3. Copy `.env.example` to `.env`, then replace both JWT placeholders with different random secrets of at least 32 characters.
-4. Start the app in development mode:
+3. Start the app in development mode:
    ```bash
    npm run dev
    ```
 
 Backend runs on `http://localhost:3001` and Vite dev server on `http://localhost:5173`.
+The development runtime supplies complete starter configuration when `.env` is absent. A local MongoDB service is expected at `mongodb://localhost/mern_app-template-withauth`.
+
+> **Production warning:** The built-in values are for local development only. Before deploying, create `.env` from `.env.example` or configure the hosting provider, then replace the database URL, browser origins, JWT secrets, and any provider-specific settings. Production mode rejects missing secrets and the built-in development signing keys.
 
 ## Environment Variables
 
-Create a root `.env` from the tracked `.env.example`. Runtime validation fails fast when secrets are missing, shorter than 32 characters, or reused.
+The root `.env` file is optional for local development. Copy `.env.example` when you want to override a starter value. Runtime validation fails fast in production when secrets are missing, use a development default, are shorter than 32 characters, or are reused.
 
 | Variable                    | Required      | Default                 | Purpose                                       |
 | --------------------------- | ------------- | ----------------------- | --------------------------------------------- |
+| `NODE_ENV`                  | No            | `development`           | Runtime security and optimization mode        |
 | `PORT`                      | No            | `3001`                  | API server port                               |
 | `MONGODB_URI`               | In production | local MongoDB URL       | MongoDB connection string                     |
 | `CLIENT_ORIGINS`            | No            | `http://localhost:5173` | Comma-separated exact CORS origin allowlist   |
 | `TRUST_PROXY`               | No            | `false`                 | Express proxy hops or named proxy setting     |
 | `REQUEST_BODY_LIMIT`        | No            | `100kb`                 | JSON and form request-size ceiling            |
-| `JWT_ACCESS_SECRET`         | Yes           | none                    | Unique 32+ character access signing secret    |
-| `JWT_REFRESH_SECRET`        | Yes           | none                    | Different 32+ character refresh secret        |
+| `RATE_LIMIT_STORE`          | No            | `memory`                | `redis` enables distributed request quotas    |
+| `RATE_LIMIT_REDIS_URL`      | With Redis    | local Redis URL in dev  | Shared `redis://` or `rediss://` connection   |
+| `RATE_LIMIT_REDIS_PREFIX`   | No            | app/environment prefix  | Isolates this deployment's distributed counts |
+| `JWT_ACCESS_SECRET`         | In production | development-only key    | Unique 32+ character access signing secret    |
+| `JWT_REFRESH_SECRET`        | In production | development-only key    | Different 32+ character refresh secret        |
 | `JWT_ISSUER`                | No            | `mern-app-template`     | Required token issuer                         |
 | `JWT_AUDIENCE`              | No            | `mern-app-client`       | Required token audience                       |
 | `ACCESS_TOKEN_EXPIRES_IN`   | No            | `15m`                   | Access token TTL                              |
 | `REFRESH_TOKEN_EXPIRES_IN`  | No            | `7d`                    | Refresh token TTL                             |
 | `REFRESH_COOKIE_MAX_AGE_MS` | No            | `604800000`             | Refresh cookie lifetime in milliseconds       |
 | `BCRYPT_ROUNDS`             | No            | `12`                    | Bcrypt work factor, bounded between 10 and 15 |
-| `ADMIN_EMAIL`               | Command only  | none                    | Existing account to promote                   |
+| `ADMIN_EMAIL`               | Command only  | `admin@example.local`   | Existing account to promote                   |
 | `ALLOW_ADMIN_PROMOTION`     | Command only  | `false`                 | Explicit guard for the promotion command      |
 
 ## Available Scripts
@@ -79,10 +87,10 @@ Create a root `.env` from the tracked `.env.example`. Runtime validation fails f
 
 | Command                 | Description                                           |
 | ----------------------- | ----------------------------------------------------- |
-| `npm start`             | Runs the production-style Node server                 |
+| `npm start`             | Runs the API and Vite development servers             |
 | `npm run dev`           | Runs API via Nodemon + Vite dev server concurrently   |
 | `npm run start:dev`     | Compatibility alias for `npm run dev`                 |
-| `npm run start:prod`    | Compatibility alias for `npm start`                   |
+| `npm run start:prod`    | Runs the production-style Node server                 |
 | `npm run build`         | Builds the Vite client to `client/dist`               |
 | `npm run docs:generate` | Rebuilds granular backend and client JSDoc references |
 | `npm run docs:check`    | Fails when generated references are missing or stale  |
@@ -113,8 +121,8 @@ Create a root `.env` from the tracked `.env.example`. Runtime validation fails f
 2. A versioned refresh token is set as a `Secure` production, `HttpOnly`, `SameSite=Strict` cookie scoped to `/api/users`.
 3. The client keeps the access token only in module memory and sends it as `Authorization: Bearer <token>`.
 4. On initial load or one eligible `401`, the client calls `POST /api/users/refresh`; auth endpoints never recursively trigger refresh.
-5. Refresh rotates the server-side session version, invalidating the previous refresh token.
-6. Logout or refresh failure clears both cookie and in-memory session state.
+5. Refresh atomically rotates the current device's credential. Competing refreshes receive a retryable conflict without clearing the cookie.
+6. Logout revokes the current device. Confirmed invalid credentials clear local state; transient infrastructure failures do not deliberately discard a valid session.
 
 ## API Endpoints
 
@@ -167,7 +175,6 @@ npm run docs:check
 
 The generator scans:
 
-- `server.js`
 - `app/**/*.js`
 - `client/src/**/*.{js,jsx}`
 
@@ -190,23 +197,65 @@ Playwright snapshot image baselines are intentionally gitignored in this boilerp
 
 ```text
 app/
+  index.js
   config/
+    index.js
+    runtime/
+      runtime.js
+      runtime.test.js
   controllers/
+    index.js
+    users/
+      users.js
+      users.test.js
+  create-app/
+    create-app.js
+    create-app.test.js
   middleware/
   models/
   routes/
+    index.js
+    api-router/
+    root-router/
+    users-router/
+  server/
+    server.js
+    server.test.js
   utils/
 client/
   src/
     api/
+      index.js
+      auth/
+        auth.js
+        auth.test.js
+      axiosClient/
+      tokenStore/
+    App/
     components/
+      index.js
+      parts/
+      pages/
+    config/
     context/
-    layouts/
-    pages/
-server.js
 docs/
 .github/
 ```
+
+Every client API and backend runtime module has a same-named folder containing
+its source and colocated test. Parent `index.js` files provide explicit named
+exports; they do not implement routes or other application behavior. Consumers
+use the parent entry point, while modules inside the same group import their
+siblings directly to avoid circular dependencies. The client retains ES modules;
+the backend retains CommonJS.
+
+For example, client consumers use `import { loginUser } from "./api/index.js"`,
+and backend consumers use `const { loadRuntimeConfig } = require("./config/index.js")`.
+Controllers expose the `hash` and `userController` namespaces to keep their APIs
+distinct; models expose `User`. Runtime startup lives in `app/server/server.js`,
+and the existing npm development and production commands target that entry point.
+Restart an already-running development command after migrating from the old root
+`server.js` path. Structure contract tests enforce colocation and public exports.
 
 ## Production Notes
 
@@ -217,10 +266,10 @@ docs/
 - Start API in production mode:
   ```bash
   # macOS/Linux
-  NODE_ENV=production npm start
+  NODE_ENV=production npm run start:prod
 
   # PowerShell
-  $env:NODE_ENV='production'; npm start
+  $env:NODE_ENV='production'; npm run start:prod
   ```
 - In production, Express serves `client/dist` as static assets.
 - Set secure, unique JWT secrets and a production MongoDB URI.

@@ -11,7 +11,7 @@ export default [
     ignores: ["client/**", "docs/**", "node_modules/**"],
   },
   {
-    files: ["server.js", "app/**/*.js"],
+    files: ["app/**/*.js"],
     ...js.configs.recommended,
     languageOptions: {
       ecmaVersion: "latest",
@@ -23,7 +23,7 @@ export default [
     },
   },
   {
-    files: ["scripts/**/*.mjs"],
+    files: ["scripts/**/*.mjs", "shared/**/*.mjs"],
     ...js.configs.recommended,
     languageOptions: {
       ecmaVersion: "latest",

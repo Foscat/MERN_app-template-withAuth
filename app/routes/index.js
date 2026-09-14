@@ -1,12 +1,9 @@
 /**
  * @module app/routes
- * @description Root router that mounts all API route groups.
+ * @description Named public exports for this backend module group. Internal siblings import directly to avoid barrel cycles.
  */
+const { createRoutes } = require("./root-router/root-router.js");
+const { createApiRouter } = require("./api-router/api-router.js");
+const { createUsersRouter } = require("./users-router/users-router.js");
 
-/** Express router for application endpoints. @type {Object} */
-const router = require("express").Router();
-const apiRoutes = require("./api");
-
-router.use("/api", apiRoutes);
-
-module.exports = router;
+module.exports = { createRoutes, createApiRouter, createUsersRouter };

@@ -1,23 +1,43 @@
 <!doctype html>
-<html lang="en" data-ui="bento" data-theme="service-blue-red" data-mode="dark">
+<html lang="en">
   <head>
     <meta charset="UTF-8" />
     <meta
       name="description"
-      content="A secure, responsive MERN starter with JWT authentication and a semantic Bento UI system."
+      content="A secure, responsive MERN starter with JWT authentication and a configurable semantic UI system."
     />
-    <meta name="theme-color" content="#07111f" />
-    <link rel="icon" type="image/png" href="/images/favicon.png" />
+    <meta name="color-scheme" content="light dark" />
+    <meta name="msapplication-TileColor" content="#07111f" />
+    <meta name="msapplication-config" content="/browserconfig.xml" />
+    <meta
+      name="theme-color"
+      content="#f8f9fd"
+      media="(prefers-color-scheme: light)"
+    />
+    <meta
+      name="theme-color"
+      content="#07111f"
+      media="(prefers-color-scheme: dark)"
+    />
+    <link rel="icon" href="/favicon.ico" sizes="any" />
+    <link
+      rel="icon"
+      type="image/png"
+      sizes="32x32"
+      href="/images/favicon-32x32.png"
+    />
+    <link
+      rel="icon"
+      type="image/png"
+      sizes="16x16"
+      href="/images/favicon-16x16.png"
+    />
+    <link rel="apple-touch-icon" href="/images/apple-touch-icon.png" />
+    <link rel="manifest" href="/site.webmanifest" />
     <title>MERN Forge</title>
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   </head>
-  <body
-    class="ly-root"
-    data-ui="bento"
-    data-theme="service-blue-red"
-    data-mode="dark"
-    data-ly-layout="bento"
-  >
+  <body class="ly-root">
     <div id="root"></div>
     <script type="module" src="/src/main.jsx"></script>
   </body>

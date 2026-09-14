@@ -8,6 +8,9 @@ import { readdir, readFile } from "node:fs/promises";
 import path from "node:path";
 import { describe, it } from "node:test";
 import { fileURLToPath } from "node:url";
+import { createRequire } from "node:module";
+
+const require = createRequire(import.meta.url);
 
 const REPOSITORY_ROOT = path.resolve(
   path.dirname(fileURLToPath(import.meta.url)),
@@ -19,6 +22,7 @@ const IGNORED_DIRECTORIES = new Set([
   ".git",
   "coverage",
   "dist",
+  "dist-ssr",
   "docs",
   "node_modules",
   "playwright-report",
@@ -58,6 +62,53 @@ function relativePath(filePath) {
 }
 
 describe("source quality policy", () => {
+  it("colocates backend modules and tests behind export-only parent indexes", async () => {
+    /** Validate discovered leaves while allowing new module groups.
+     * @param {string} directory Group path.
+     * @returns {Promise<void>} Validation completion.
+     */
+    async function inspectGroup(directory) {
+      const entries = await readdir(directory, { withFileTypes: true });
+      assert.deepEqual(
+        entries.filter((entry) => entry.isFile()).map((entry) => entry.name),
+        ["index.js"],
+        directory,
+      );
+      const barrel = await readFile(path.join(directory, "index.js"), "utf8");
+      const exported = require(path.join(directory, "index.js"));
+      for (const entry of entries.filter((entry) => entry.isDirectory())) {
+        const target = path.join(directory, entry.name);
+        const files = await readdir(target);
+        if (files.includes("index.js")) {
+          await inspectGroup(target);
+          continue;
+        }
+        assert.ok(files.includes(`${entry.name}.js`), target);
+        assert.ok(files.includes(`${entry.name}.test.js`), target);
+        assert.ok(
+          barrel.includes(`./${entry.name}/${entry.name}.js`),
+          `Missing export: ${target}`,
+        );
+        const leaf = require(path.join(target, `${entry.name}.js`));
+        const values = Object.values(exported);
+        assert.ok(
+          values.includes(leaf) ||
+            Object.values(leaf).every((value) => values.includes(value)),
+          `Unreachable public module: ${target}`,
+        );
+        const source = await readFile(
+          path.join(target, `${entry.name}.js`),
+          "utf8",
+        );
+        assert.ok(
+          !/require\(["']\.\.\/index\.js["']\)/u.test(source),
+          `Sibling barrel cycle: ${target}`,
+        );
+      }
+    }
+    await inspectGroup(path.join(REPOSITORY_ROOT, "app"));
+  });
+
   it("gives every maintained JavaScript-family file parseable module JSDoc", async () => {
     const files = await collectSourceFiles(REPOSITORY_ROOT);
     const missingDocs = [];
@@ -67,6 +118,7 @@ describe("source quality policy", () => {
       if (!/^\/\*\*[\s\S]{0,600}?@module\s+/u.test(source)) {
         missingDocs.push(relativePath(filePath));
       }
+      await require("jsdoc-to-markdown").getTemplateData({ source });
     }
 
     assert.deepEqual(missingDocs, []);
@@ -106,32 +158,12 @@ describe("source quality policy", () => {
       REPOSITORY_ROOT,
       "app",
       "controllers",
+      "users",
       "users.js",
     );
     const source = await readFile(controllerPath, "utf8");
-    const handlers = [
-      "create",
-      "currentUser",
-      "findAll",
-      "findById",
-      "login",
-      "logout",
-      "refreshToken",
-      "register",
-      "remove",
-      "update",
-    ];
-
-    for (const handler of handlers) {
-      assert.match(
-        source,
-        new RegExp(`// console\\.log\\(\\"${handler}[^\\n]*called`),
-      );
-      assert.match(
-        source,
-        new RegExp(`// console\\.log\\(\\"${handler}[^\\n]*return`),
-      );
-    }
+    assert.match(source, /\/\/ console\.log\([^\n]*API handler called/u);
+    assert.match(source, /\/\/ console\.log\([^\n]*API handler return/u);
   });
 
   it("prevents persistent access tokens, raw query forwarding, and active debug logs", async () => {

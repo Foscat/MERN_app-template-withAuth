@@ -3,6 +3,7 @@
  * @description Model registry for database collections.
  */
 
-module.exports = {
-  User: require("./users"),
-};
+const User = require("./users/users.js");
+
+const Session = require("./sessions/sessions.js");
+module.exports = { User, Session };

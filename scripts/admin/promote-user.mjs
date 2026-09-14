@@ -7,7 +7,7 @@ import process from "node:process";
 import { pathToFileURL } from "node:url";
 import dotenv from "dotenv";
 import mongoose from "mongoose";
-import User from "../../app/models/users.js";
+import { User } from "../../app/models/index.js";
 
 dotenv.config({ quiet: true });
 

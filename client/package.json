@@ -7,7 +7,7 @@
   },
   "scripts": {
     "dev": "vite",
-    "build": "vite build",
+    "build": "node ../scripts/seo/build.mjs",
     "preview": "vite preview",
     "lint": "eslint . --max-warnings 0",
     "format": "prettier --write \"src/**/*.{js,jsx,css}\" \"playwright/**/*.js\" \"*.{js,mjs,json,md,html}\"",

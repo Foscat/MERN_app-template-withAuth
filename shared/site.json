@@ -1,0 +1,11 @@
+{
+  "name": "MERN Forge",
+  "tagline": "Secure starter workspace",
+  "origin": "",
+  "language": "en",
+  "titleTemplate": "%s | MERN Forge",
+  "description": "A secure, responsive MERN starter with authentication and a configurable semantic UI system.",
+  "socialImage": "/images/social-preview.png",
+  "socialImageAlt": "MERN Forge application preview",
+  "indexingEnabled": false
+}

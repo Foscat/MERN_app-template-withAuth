@@ -7,4 +7,12 @@
 <a name="module_main"></a>
 
 ## main
-Client entrypoint and semantic stylesheet composition root.
+Client entrypoint and configuration-driven stylesheet composition root.
+
+<a name="module_main..renderApplication"></a>
+
+### main~renderApplication() ⇒ <code>Promise.&lt;void&gt;</code>
+Load semantic CSS in ownership order before mounting the application.
+
+**Kind**: inner method of [<code>main</code>](#module_main)
+**Returns**: <code>Promise.&lt;void&gt;</code> - Completion after styles and React are ready.

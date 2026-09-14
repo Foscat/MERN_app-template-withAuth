@@ -70,11 +70,10 @@ describe("semantic UI integration", () => {
       "utf8",
     );
     const semanticImports = [
-      'import "ui-style-kit-css/visual/bento.css";',
-      'import "ui-style-kit-css/interactive-surface-theme.css";',
-      'import "interactive-surface-css/state-core.css";',
-      'import "layout-style-css";',
-      'import "./index.css";',
+      "await loadConfiguredStyle(siteConfig);",
+      'await import("ui-style-kit-css/interactive-surface-theme.css");',
+      'await import("interactive-surface-css/state-core.css");',
+      'await import("layout-style-css");',
     ];
     const importPositions = semanticImports.map((statement) =>
       mainSource.indexOf(statement),
@@ -84,5 +83,12 @@ describe("semantic UI integration", () => {
     expect(importPositions).toEqual(
       [...importPositions].sort((left, right) => left - right),
     );
+
+    const localStylesheets = collectTextFiles(
+      join(CLIENT_DIRECTORY, "src"),
+    ).filter((filePath) => extname(filePath) === ".css");
+
+    expect(mainSource).not.toContain('import("./index.css")');
+    expect(localStylesheets).toEqual([]);
   });
 });

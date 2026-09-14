@@ -15,6 +15,16 @@ concurrency:
 jobs:
   verify:
     runs-on: ubuntu-latest
+    services:
+      mongo:
+        image: mongo:8.2
+        ports: ["27017:27017"]
+      redis:
+        image: redis:8-alpine
+        ports: ["6379:6379"]
+    env:
+      TEST_MONGODB_URI: mongodb://127.0.0.1:27017/template_ci
+      TEST_REDIS_URL: redis://127.0.0.1:6379
     timeout-minutes: 20
     steps:
       - name: Check out repository
@@ -44,3 +54,5 @@ jobs:
 
       - name: Run browser smoke tests
         run: npm --prefix client run test:e2e
+      - name: Verify real shared infrastructure and crawlable HTML
+        run: npm run test:multi-instance && npm run test:seo

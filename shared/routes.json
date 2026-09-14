@@ -1,0 +1,59 @@
+[
+  {
+    "path": "/",
+    "component": "Home",
+    "title": "Home",
+    "label": "Home",
+    "icon": "home",
+    "access": "public",
+    "indexable": true,
+    "primary": true
+  },
+  {
+    "path": "/login",
+    "component": "Login",
+    "title": "Log in",
+    "label": "Log in",
+    "icon": "key",
+    "access": "guest",
+    "primary": true
+  },
+  {
+    "path": "/register",
+    "component": "Register",
+    "title": "Register",
+    "label": "Register",
+    "icon": "user",
+    "access": "guest",
+    "primary": true
+  },
+  {
+    "path": "/dashboard",
+    "component": "Dashboard",
+    "title": "Dashboard",
+    "label": "Dashboard",
+    "workspaceLabel": "Overview",
+    "icon": "dashboard",
+    "access": "private",
+    "primary": true,
+    "workspace": true
+  },
+  {
+    "path": "/profile",
+    "component": "Profile",
+    "title": "Profile",
+    "label": "Profile",
+    "icon": "user",
+    "access": "private",
+    "workspace": true
+  },
+  {
+    "path": "/settings",
+    "component": "Settings",
+    "title": "Settings",
+    "label": "Settings",
+    "icon": "settings",
+    "access": "private",
+    "workspace": true
+  }
+]

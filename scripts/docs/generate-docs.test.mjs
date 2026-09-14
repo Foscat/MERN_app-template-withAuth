@@ -13,6 +13,33 @@ import test from "node:test";
 import { pathToFileURL } from "node:url";
 
 const generatorPath = path.resolve("scripts/docs/generate-docs.mjs");
+test("discovers and parses shared and tooling modules beyond js extensions", async () => {
+  const { createDocumentationPlan } = await import(
+    pathToFileURL(generatorPath)
+  );
+  const root = await mkdtemp(path.join(os.tmpdir(), "mern-docs-extensions-"));
+  try {
+    for (const source of [
+      "shared/metadata/metadata.mjs",
+      "scripts/setup/setup.cjs",
+    ]) {
+      await mkdir(path.dirname(path.join(root, source)), { recursive: true });
+      await writeFile(
+        path.join(root, source),
+        "/**\n * @module example\n */\n/**\n * Return a safe value.\n * @returns {number} Result.\n */\nfunction example() { return 1; }\n",
+      );
+    }
+    const plan = await createDocumentationPlan({ rootDir: root });
+    const manifest = JSON.parse(plan.get("docs/generated/manifest.json"));
+    assert.equal(manifest.modules.length, 2);
+    assert.match(
+      plan.get("docs/generated/backend/shared/metadata/metadata.mjs.md"),
+      /Return a safe value/,
+    );
+  } finally {
+    await rm(root, { recursive: true, force: true });
+  }
+});
 
 test("creates a stable module-per-file documentation plan without test sources", async () => {
   assert.equal(
