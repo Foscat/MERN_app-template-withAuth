@@ -1,32 +1,40 @@
 /**
  * @module layouts.DashboardLayout
- * @description Layout component for authenticated dashboard pages and navigation.
+ * @description Responsive authenticated shell composed with Layout Style CSS areas.
  */
-import { Container, Sidebar, Content } from "rsuite";
+
 import AppSidebar from "../components/AppSidebar";
 import AppHeader from "../components/AppHeader";
 
 /**
- * @file DashboardLayout.jsx
- * @component DashboardLayout
- * @description A layout component for the dashboard pages. It includes a sidebar, header, and content area.
- * @param {Object} props - The component props.
- * @param {React.ReactNode} props.children - The child components to render within the layout.
- * @param {string} [props.active="dashboard"] - The active sidebar item.
- * @param {string} props.title - The title to display in the header.
- * @returns {JSX.Element} - The rendered dashboard layout component.
+ * Render the authenticated workspace shell.
+ *
+ * @param {Object} props - Layout properties.
+ * @param {React.ReactNode} props.children - Route content.
+ * @param {string} [props.active="dashboard"] - Current sidebar key.
+ * @param {string} props.title - Workspace heading.
+ * @returns {JSX.Element} Dashboard application shell.
  */
-export default function DashboardLayout({ children, active = "dashboard", title }) {
+export default function DashboardLayout({
+  children,
+  active = "dashboard",
+  title,
+}) {
   return (
-    <Container style={{ height: "100vh" }}>
-      <Sidebar width={260} collapsible>
-        <AppSidebar active={active} />
-      </Sidebar>
-
-      <Container>
-        <AppHeader title={title} />
-        <Content style={{ padding: 20, overflow: "auto" }}>{children}</Content>
-      </Container>
-    </Container>
+    <main
+      className="ly-wrapper ly-wrapper--wide app-dashboard-shell"
+      data-ly-recipe="app-shell"
+    >
+      <AppSidebar active={active} />
+      <AppHeader title={title} />
+      <section className="ly-stack app-dashboard-content" data-ly-area="main">
+        {children}
+      </section>
+      <footer className="app-dashboard-footer" data-ly-area="footer">
+        <span>Service Blue + Red</span>
+        <span aria-hidden="true">•</span>
+        <span>Bento UI dark workspace</span>
+      </footer>
+    </main>
   );
 }

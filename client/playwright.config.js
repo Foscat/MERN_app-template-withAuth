@@ -1,3 +1,8 @@
+/**
+ * @module client/playwright.config
+ * @description Playwright visual-regression configuration for public application routes.
+ */
+
 const { defineConfig } = require("@playwright/test");
 
 module.exports = defineConfig({
@@ -16,7 +21,7 @@ module.exports = defineConfig({
     browserName: "chromium",
     baseURL: "http://127.0.0.1:4173",
     viewport: { width: 1440, height: 900 },
-    colorScheme: "light",
+    colorScheme: "dark",
     timezoneId: "America/Chicago",
   },
   webServer: {

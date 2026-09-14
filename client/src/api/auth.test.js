@@ -21,7 +21,9 @@ describe("auth api helpers", () => {
     const payload = { email: "user@example.com", password: "test1234" };
     api.post.mockResolvedValueOnce({ data: { token: "access-token" } });
 
-    await expect(loginUser(payload)).resolves.toEqual({ token: "access-token" });
+    await expect(loginUser(payload)).resolves.toEqual({
+      token: "access-token",
+    });
     expect(api.post).toHaveBeenCalledWith("/users/login", payload);
   });
 
@@ -34,7 +36,9 @@ describe("auth api helpers", () => {
     };
     api.post.mockResolvedValueOnce({ data: { token: "access-token" } });
 
-    await expect(registerUser(payload)).resolves.toEqual({ token: "access-token" });
+    await expect(registerUser(payload)).resolves.toEqual({
+      token: "access-token",
+    });
     expect(api.post).toHaveBeenCalledWith("/users/register", payload);
   });
 });

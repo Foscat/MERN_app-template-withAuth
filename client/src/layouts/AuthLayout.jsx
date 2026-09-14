@@ -1,35 +1,56 @@
 /**
  * @module layouts.AuthLayout
- * @description Layout wrapper for authentication screens and shared auth framing.
+ * @description Responsive Bento frame shared by authentication routes.
  */
-import { Container, Content, FlexboxGrid, Panel } from "rsuite";
+
+import Icon from "../components/Icon";
 
 /**
- * @file AuthLayout.jsx
- * @component AuthLayout
- * @description A layout component for authentication pages (e.g., login, register). It centers the content on the page and provides a consistent header for the authentication forms.
- * @param {Object} props - The component props.
- * @param {React.ReactNode} props.children - The child components to render within the layout (e.g., login form).
- * @param {string} props.title - The title to display in the header of the panel.
- * @returns {JSX.Element} - The rendered authentication layout component.
+ * Render a centered authentication card with product context.
+ *
+ * @param {Object} props - Layout properties.
+ * @param {React.ReactNode} props.children - Authentication form content.
+ * @param {string} props.title - Form heading.
+ * @returns {JSX.Element} Authentication route layout.
  */
 export default function AuthLayout({ children, title }) {
   return (
-    <Container>
-      <Content>
-        <Row justify="center" align="middle" style={{ height: "100vh" }}>
-          <Col colspan={8}>
-            <Panel
-              header={<h3 style={{ margin: 0 }}>{title}</h3>}
-              bordered
-              shaded
-              style={{ padding: 20 }}
-            >
-              {children}
-            </Panel>
-          </Col>
-        </Row>
-      </Content>
-    </Container>
+    <main className="ly-wrapper ly-wrapper--workspace app-auth-page">
+      <section className="app-auth-grid" data-ly-recipe="split-hero">
+        <div
+          className="ui-card bento-panel app-auth-intro ly-stack"
+          data-ly-area="content"
+        >
+          <span className="ui-badge bento-status is-info">MERN Forge</span>
+          <div className="app-auth-emblem">
+            <Icon name="shield" size={34} />
+          </div>
+          <h1>Build securely from the first screen.</h1>
+          <p className="app-lead">
+            A clear authentication foundation, responsive application shell, and
+            semantic component system are already connected.
+          </p>
+          <ul className="app-feature-list">
+            <li>JWT access and refresh-token flow</li>
+            <li>Protected routes with role support</li>
+            <li>Bento UI components with accessible states</li>
+          </ul>
+        </div>
+
+        <article
+          className="ui-card bento-panel app-auth-card ly-stack"
+          data-ly-area="media"
+        >
+          <header className="ly-stack">
+            <span className="bento-eyebrow">Secure access</span>
+            <h2>{title}</h2>
+            <p className="app-muted">
+              Use your account credentials to continue.
+            </p>
+          </header>
+          {children}
+        </article>
+      </section>
+    </main>
   );
 }

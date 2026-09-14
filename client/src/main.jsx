@@ -1,32 +1,25 @@
 /**
  * @module main
- * @description Client application entrypoint that mounts the React app tree.
+ * @description Client entrypoint and semantic stylesheet composition root.
  */
-import React from "react";
-import ReactDOM from "react-dom/client";
-import App from "./App";
-import "rsuite/dist/rsuite.min.css";
+import "ui-style-kit-css/visual/bento.css";
+import "ui-style-kit-css/interactive-surface-theme.css";
+import "interactive-surface-css/state-core.css";
+import "layout-style-css";
 import "./index.css";
 
-import { ThemeProvider, useTheme } from "./context/ThemeContext";
+import React from "react";
+import ReactDOM from "react-dom/client";
+import App from "./App.jsx";
+import { ThemeProvider } from "./context/ThemeContext";
 import { UserProvider } from "./context/UserContext";
-import { CustomProvider } from "rsuite";
-
-function ThemedApp() {
-  const { theme } = useTheme();
-  return (
-    <CustomProvider theme={theme}>
-      <App />
-    </CustomProvider>
-  );
-}
 
 ReactDOM.createRoot(document.getElementById("root")).render(
   <React.StrictMode>
     <ThemeProvider>
       <UserProvider>
-        <ThemedApp />
+        <App />
       </UserProvider>
     </ThemeProvider>
-  </React.StrictMode>
+  </React.StrictMode>,
 );

@@ -17,8 +17,7 @@ import api from "./axiosClient";
  * @property {string} password - User password.
  * @property {string} [name] - Display name.
  * @property {string} [username] - Unique username.
- * @property {number} [phone_num] - Optional phone number.
- * @property {string} [role] - Optional role override.
+ * @property {string} [phoneNumber] - Optional phone number.
  */
 
 /**
@@ -26,13 +25,21 @@ import api from "./axiosClient";
  * @param {LoginPayload} payload - Login request payload.
  * @returns {Promise<{ token: string }>} API response payload.
  */
-export const loginUser = (payload) =>
-  api.post("/users/login", payload).then((res) => res.data);
+export async function loginUser(payload) {
+  // console.log("loginUser API call", { endpoint: "/users/login" });
+  const response = await api.post("/users/login", payload);
+  // console.log("loginUser API return", { authenticated: Boolean(response.data?.token) });
+  return response.data;
+}
 
 /**
  * Register a new account and receive an access token.
  * @param {RegisterPayload} payload - Registration request payload.
  * @returns {Promise<{ token: string }>} API response payload.
  */
-export const registerUser = (payload) =>
-  api.post("/users/register", payload).then((res) => res.data);
+export async function registerUser(payload) {
+  // console.log("registerUser API call", { endpoint: "/users/register" });
+  const response = await api.post("/users/register", payload);
+  // console.log("registerUser API return", { registered: Boolean(response.data?.token) });
+  return response.data;
+}

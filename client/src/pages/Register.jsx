@@ -8,29 +8,38 @@ import AuthLayout from "../layouts/AuthLayout";
 import AuthForm from "../components/AuthForm";
 import { registerUser } from "../api/auth";
 import { useUser } from "../context/UserContext";
-import jwtDecode from "jwt-decode";
 
+/**
+ * Render account registration and establish the new client session.
+ *
+ * @returns {JSX.Element} Registration route.
+ */
 export default function Register() {
   const navigate = useNavigate();
-  const { setUser } = useUser();
+  const { establishSession } = useUser();
 
   const [formValue, setFormValue] = useState({
     email: "",
+    name: "",
     password: "",
+    username: "",
   });
 
   const [error, setError] = useState("");
 
+  /**
+   * Register the submitted credentials and enter the dashboard.
+   *
+   * @returns {Promise<void>}
+   */
   const handleSubmit = async () => {
     setError("");
 
     try {
       const data = await registerUser(formValue);
-      localStorage.setItem("token", data.token);
-      const decoded = jwtDecode(data.token);
-      setUser(decoded);
+      establishSession(data);
       navigate("/dashboard");
-    } catch (err) {
+    } catch {
       setError("Registration failed. Email may already be in use.");
     }
   };
@@ -43,9 +52,11 @@ export default function Register() {
         onSubmit={handleSubmit}
         buttonLabel="Create Account"
         error={error}
+        includeRegistrationFields
+        passwordAutoComplete="new-password"
       />
 
-      <p style={{ marginTop: 16 }}>
+      <p className="app-auth-switch">
         Already have an account? <Link to="/login">Login</Link>
       </p>
     </AuthLayout>

@@ -1,67 +1,79 @@
 /**
  * @module components.AppSidebar
- * @description Reusable UI component module.
+ * @description Authenticated workspace navigation using semantic links and states.
  */
-import { Sidenav, Nav } from "rsuite";
-import DashboardIcon from "@rsuite/icons/legacy/Dashboard";
-import UserIcon from "@rsuite/icons/legacy/User";
-import CogIcon from "@rsuite/icons/legacy/Cog";
-import ExitIcon from "@rsuite/icons/Exit";
-import { useNavigate } from "react-router-dom";
 
+import { NavLink } from "react-router-dom";
+import Icon from "./Icon";
+import { useUser } from "../context/UserContext";
+
+const NAVIGATION_ITEMS = [
+  {
+    key: "dashboard",
+    label: "Overview",
+    path: "/dashboard",
+    icon: "dashboard",
+  },
+  { key: "profile", label: "Profile", path: "/profile", icon: "user" },
+  { key: "settings", label: "Settings", path: "/settings", icon: "settings" },
+];
+
+/**
+ * Render dashboard navigation and its current-route state.
+ *
+ * @param {Object} props - Sidebar properties.
+ * @param {string} [props.active] - Current navigation key.
+ * @returns {JSX.Element} Authenticated navigation sidebar.
+ */
 export default function AppSidebar({ active }) {
-  const navigate = useNavigate();
-
-  const handleLogout = () => {
-    localStorage.removeItem("token");
-    navigate("/login");
-  };
+  const { logout } = useUser();
 
   return (
-    <Sidenav
-      appearance="subtle"
-      style={{
-        height: "100%",
-        borderRight: "1px solid #e5e5ea",
-        paddingTop: 20,
-      }}
+    <aside
+      className="ui-card bento-panel bento-sidebar app-sidebar"
+      data-ly-area="sidebar"
     >
-      <Sidenav.Body>
-        <Nav activeKey={active}>
-          <Nav.Item
-            eventKey="dashboard"
-            icon={<DashboardIcon />}
-            onClick={() => navigate("/dashboard")}
-          >
-            Dashboard
-          </Nav.Item>
+      <div className="bento-brand app-sidebar__brand">
+        <span className="bento-brand-mark" aria-hidden="true">
+          M
+        </span>
+        <span>
+          <strong>Workspace</strong>
+          <small>Member console</small>
+        </span>
+      </div>
 
-          <Nav.Item
-            eventKey="profile"
-            icon={<UserIcon />}
-            onClick={() => navigate("/profile")}
+      <nav
+        className="ui-nav ly-stack app-sidebar__nav"
+        aria-label="Workspace navigation"
+      >
+        {NAVIGATION_ITEMS.map((item) => (
+          <NavLink
+            aria-current={active === item.key ? "page" : undefined}
+            className="ui-nav-link interactive-surface variant-subtle app-sidebar__link"
+            key={item.key}
+            to={item.path}
           >
-            Profile
-          </Nav.Item>
+            <Icon name={item.icon} />
+            <span>{item.label}</span>
+          </NavLink>
+        ))}
+      </nav>
 
-          <Nav.Item
-            eventKey="settings"
-            icon={<CogIcon />}
-            onClick={() => navigate("/settings")}
-          >
-            Settings
-          </Nav.Item>
-
-          <Nav.Item
-            eventKey="logout"
-            icon={<ExitIcon />}
-            style={{ marginTop: 30 }}
-            onClick={handleLogout}
-          >
-            Logout
-          </Nav.Item>
-        </Nav>
-      </Sidenav.Body>
-    </Sidenav>
+      <div className="bento-sidebar-spacer" />
+      <div className="bento-sidebar-note ly-stack">
+        <span className="bento-eyebrow">Template status</span>
+        <strong>Ready to extend</strong>
+        <p>Authentication, layout, and semantic styling are connected.</p>
+      </div>
+      <button
+        className="ui-button interactive-surface variant-subtle app-sidebar__logout"
+        type="button"
+        onClick={logout}
+      >
+        <Icon name="logout" />
+        Log out
+      </button>
+    </aside>
   );
 }

@@ -25,29 +25,34 @@ This is the easiest and most reliable deployment path for this boilerplate.
 
 Set these on your hosting platform:
 
-| Variable | Required | Example | Notes |
-| -------- | -------- | ------- | ----- |
-| `NODE_ENV` | Yes | `production` | Must be `production` in deployed environments |
-| `PORT` | No | `3001` | Platform usually injects this automatically |
-| `MONGODB_URI` | Yes | `mongodb+srv://...` | Use MongoDB Atlas or managed Mongo |
-| `CLIENT_ORIGIN` | Usually Yes | `https://your-app.onrender.com` | Should match your public app URL |
-| `JWT_ACCESS_SECRET` | Yes | random 32+ chars | Access token signing secret |
-| `JWT_REFRESH_SECRET` | Yes | random 32+ chars | Refresh token signing secret |
-| `ACCESS_TOKEN_EXPIRES_IN` | No | `15m` | Optional override |
-| `REFRESH_TOKEN_EXPIRES_IN` | No | `7d` | Optional override |
-| `salt` | Yes | `10` | bcrypt salt rounds |
+| Variable                    | Required    | Example                         | Notes                                           |
+| --------------------------- | ----------- | ------------------------------- | ----------------------------------------------- |
+| `NODE_ENV`                  | Yes         | `production`                    | Must be `production` in deployed environments   |
+| `PORT`                      | No          | `3001`                          | Platform usually injects this automatically     |
+| `MONGODB_URI`               | Yes         | `mongodb+srv://...`             | Use MongoDB Atlas or managed Mongo              |
+| `CLIENT_ORIGINS`            | Usually Yes | `https://your-app.onrender.com` | Comma-separated exact browser origins           |
+| `TRUST_PROXY`               | Platform    | `1`                             | Use the provider's documented proxy-hop setting |
+| `JWT_ACCESS_SECRET`         | Yes         | random 32+ chars                | Unique access-token signing secret              |
+| `JWT_REFRESH_SECRET`        | Yes         | different random 32+ chars      | Unique refresh-token signing secret             |
+| `JWT_ISSUER`                | No          | `mern-app-template`             | Token issuer checked during verification        |
+| `JWT_AUDIENCE`              | No          | `mern-app-client`               | Token audience checked during verification      |
+| `ACCESS_TOKEN_EXPIRES_IN`   | No          | `15m`                           | Optional override                               |
+| `REFRESH_TOKEN_EXPIRES_IN`  | No          | `7d`                            | Optional override                               |
+| `REFRESH_COOKIE_MAX_AGE_MS` | No          | `604800000`                     | Keep aligned with the refresh-token lifetime    |
+| `BCRYPT_ROUNDS`             | No          | `12`                            | Bounded to 10-15 by runtime code                |
 
 ## Pre-Deploy Checklist
 
 1. Create a production MongoDB database (recommended: MongoDB Atlas).
 2. Add your deployment domain to Atlas network access allowlist.
 3. Generate strong JWT secrets.
-4. Ensure Node version is `22.19.0` (already pinned in project files).
+4. Use Node `22.19.0` or a newer Node 22 release.
 5. Confirm app builds locally:
 
 ```bash
-npm install
-npm install --prefix client
+npm ci
+npm ci --prefix client
+npm run verify:ci
 npm run build
 ```
 
@@ -55,28 +60,29 @@ PowerShell local production smoke test:
 
 ```powershell
 $env:NODE_ENV='production'
-npm run start:prod
+npm start
 ```
 
 ## Render
 
 Recommended setup:
+
 - Type: **Web Service**
 - Root directory: repository root
 - Build command:
 
 ```bash
-npm install --prefix client && npm run build
+npm ci && npm ci --prefix client && npm run build
 ```
 
 - Start command:
 
 ```bash
-npm run start:prod
+npm start
 ```
 
 - Auto deploy: enabled
-- Health check path: `/`
+- Health check path: `/api/health`
 
 Set all required environment variables in Render dashboard.
 
@@ -87,13 +93,13 @@ Use **Deployments** (Autoscale or Reserved VM).
 Build command:
 
 ```bash
-npm install --prefix client && npm run build
+npm ci && npm ci --prefix client && npm run build
 ```
 
 Run command:
 
 ```bash
-npm run start:prod
+npm start
 ```
 
 Set environment secrets in Replit:
@@ -117,12 +123,12 @@ Set config vars:
 ```bash
 heroku config:set NODE_ENV=production
 heroku config:set MONGODB_URI="..."
-heroku config:set CLIENT_ORIGIN="https://<your-app-name>.herokuapp.com"
+heroku config:set CLIENT_ORIGINS="https://<your-app-name>.herokuapp.com"
 heroku config:set JWT_ACCESS_SECRET="..."
 heroku config:set JWT_REFRESH_SECRET="..."
 heroku config:set ACCESS_TOKEN_EXPIRES_IN="15m"
 heroku config:set REFRESH_TOKEN_EXPIRES_IN="7d"
-heroku config:set salt="10"
+heroku config:set BCRYPT_ROUNDS="12"
 ```
 
 Deploy:
@@ -134,22 +140,23 @@ git push heroku <your-branch>:main
 Because this repo has a client subproject, ensure frontend deps are installed during build on Heroku. If needed, set a custom build step pattern in your pipeline equivalent to:
 
 ```bash
-npm install --prefix client && npm run build
+npm ci && npm ci --prefix client && npm run build
 ```
 
 ## Railway
 
 Service settings:
+
 - Build command:
 
 ```bash
-npm install --prefix client && npm run build
+npm ci && npm ci --prefix client && npm run build
 ```
 
 - Start command:
 
 ```bash
-npm run start:prod
+npm start
 ```
 
 Set required variables in Railway dashboard, including `NODE_ENV=production`.
@@ -162,19 +169,21 @@ Typical command flow:
 
 ```bash
 fly launch
-fly secrets set NODE_ENV=production MONGODB_URI="..." CLIENT_ORIGIN="https://<app>.fly.dev" JWT_ACCESS_SECRET="..." JWT_REFRESH_SECRET="..." salt="10"
+fly secrets set NODE_ENV=production MONGODB_URI="..." CLIENT_ORIGINS="https://<app>.fly.dev" JWT_ACCESS_SECRET="..." JWT_REFRESH_SECRET="..." BCRYPT_ROUNDS="12"
 fly deploy
 ```
 
 In your Fly config, ensure build/start equivalents run:
-- build: `npm install --prefix client && npm run build`
-- start: `npm run start:prod`
+
+- build: `npm ci && npm ci --prefix client && npm run build`
+- start: `npm start`
 
 ## Vercel / Netlify Notes
 
 These are primarily frontend platforms.
 
 This boilerplate is backend + frontend in one service, so direct Vercel/Netlify deployment is not the best fit unless you:
+
 - deploy API separately (Render/Railway/Fly/etc.), and
 - update frontend API base URL strategy (current axios config assumes same-origin `/api`).
 
@@ -188,6 +197,13 @@ After deployment:
 4. Confirm refresh-token behavior (stay logged in across token refresh window).
 5. Confirm logout clears session.
 
+## Scaling and Operations
+
+- The included rate limiter uses its in-process store. Configure an `express-rate-limit` compatible shared store before running multiple application instances.
+- Keep TLS termination, `TRUST_PROXY`, and `CLIENT_ORIGINS` aligned with the hosting provider's network topology.
+- Enable managed database backups, centralized structured logging, uptime checks against `/api/health`, and secret rotation in the deployment platform.
+- Treat a signing secret as compromised if it was ever committed or exposed; replace it in every deployed environment rather than only deleting the current file.
+
 ## Common Issues
 
 ### 1. `401` after login
@@ -197,7 +213,7 @@ After deployment:
 
 ### 2. CORS errors
 
-- `CLIENT_ORIGIN` must exactly match your public frontend URL.
+- `CLIENT_ORIGINS` must include your public frontend URL exactly.
 - Include protocol (`https://...`).
 
 ### 3. Mongo connection failures
@@ -210,7 +226,7 @@ After deployment:
 - Use build command:
 
 ```bash
-npm install --prefix client && npm run build
+npm ci && npm ci --prefix client && npm run build
 ```
 
 ## Suggested Default

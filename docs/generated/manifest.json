@@ -1,0 +1,258 @@
+{
+  "schemaVersion": 1,
+  "generator": "scripts/docs/generate-docs.mjs",
+  "modules": [
+    {
+      "scope": "backend",
+      "source": "app/config/runtime.js",
+      "output": "docs/generated/backend/app/config/runtime.js.md",
+      "sourceSha256": "e3495cbf6dfab3e05671d2cc2b79ab837dd666a3927ccd0309360443e0a35a93",
+      "documentationSha256": "e6d36c0861c34f78622de43e04eeb175424b93943d52f3f4c7a749cfe8a4656f"
+    },
+    {
+      "scope": "backend",
+      "source": "app/controllers/hash.js",
+      "output": "docs/generated/backend/app/controllers/hash.js.md",
+      "sourceSha256": "70ed6f7824f6b14f8f7233a4c3a275e155e7277085a0783766d8724a801f9068",
+      "documentationSha256": "9b942b9ca8cdf4d82a6360e89bdbdb09aa8e734e83aff025f5183809fe299d00"
+    },
+    {
+      "scope": "backend",
+      "source": "app/controllers/users.js",
+      "output": "docs/generated/backend/app/controllers/users.js.md",
+      "sourceSha256": "bff24bfa3453deb0e1ba63671dd6f38ecf0240be54220e1068bb90af5166fb30",
+      "documentationSha256": "a9910b34e9bc48afa29c2a5d4bce758d26c1c79a579f5701deccdb297b6ffd78"
+    },
+    {
+      "scope": "backend",
+      "source": "app/create-app.js",
+      "output": "docs/generated/backend/app/create-app.js.md",
+      "sourceSha256": "b6a7924022155e90896a0580c0ed20d7c3437c5b7c96325a6b93f2c440e2bfcf",
+      "documentationSha256": "930c7c3f8360270e765929d6e6261ad4750c0b70d5d4d4f95760e27132781bd1"
+    },
+    {
+      "scope": "backend",
+      "source": "app/middleware/auth.js",
+      "output": "docs/generated/backend/app/middleware/auth.js.md",
+      "sourceSha256": "cc2d6789f290861ee7eb1cbd9f0bf95538f841ac53b3bc9866e5a034d33530d1",
+      "documentationSha256": "350e59f958c7da709436bd31f03b1fb562700232981d379c20a7f91a859b4031"
+    },
+    {
+      "scope": "backend",
+      "source": "app/models/index.js",
+      "output": "docs/generated/backend/app/models/index.js.md",
+      "sourceSha256": "41b82111fd4bf1b1c7312ab1922522697320e8ad78890789847296573a3ba036",
+      "documentationSha256": "65a38c24bdbc73614076f5fb109d1896855c5a3dc01f9641ecd30eda121791b0"
+    },
+    {
+      "scope": "backend",
+      "source": "app/models/users.js",
+      "output": "docs/generated/backend/app/models/users.js.md",
+      "sourceSha256": "b84fa7158747609d8ce1cf678ed1ea5d7e17b256bc4624630ade690cc4bce5ad",
+      "documentationSha256": "c3892244b7907ef0406e58856fe741ea7fced5245112e58a611259231b7245ed"
+    },
+    {
+      "scope": "backend",
+      "source": "app/routes/api/index.js",
+      "output": "docs/generated/backend/app/routes/api/index.js.md",
+      "sourceSha256": "40a97f6675729ec0c0e0566994efce38ab936635710cf96cea25c05cb94dcda9",
+      "documentationSha256": "1bf626814b81b0c3dee36aa2d1b8d538747d93e36d74364ec4fb907fd0fd9844"
+    },
+    {
+      "scope": "backend",
+      "source": "app/routes/api/users.js",
+      "output": "docs/generated/backend/app/routes/api/users.js.md",
+      "sourceSha256": "5a592a38955d62d50e82c32b0d33c6d4a7c18d74bff0a742fa364281562a0457",
+      "documentationSha256": "515e09b66f387c9e7573a0a9e58f7bff566b53e9e7ca03a79fea4b51a3f7c1bc"
+    },
+    {
+      "scope": "backend",
+      "source": "app/routes/index.js",
+      "output": "docs/generated/backend/app/routes/index.js.md",
+      "sourceSha256": "ff3c5f40520bfd547a9cee1eb94f09ed4b07171bf06ffbd7b715334a10f69a65",
+      "documentationSha256": "aff1ef2abd84e69ea478e7d5cf3bbbacbfe65f77f32ce634f72b43a9f1838f8e"
+    },
+    {
+      "scope": "backend",
+      "source": "app/utils/tokens.js",
+      "output": "docs/generated/backend/app/utils/tokens.js.md",
+      "sourceSha256": "ff6faa1dc2b212fa45add958028d061f4b5d8b48ed451a6fa4eaa27fe673db23",
+      "documentationSha256": "69de0c6e6ca5ad45c10e0f75a6345a79635983712e6a72f98024f1c61c00c80d"
+    },
+    {
+      "scope": "backend",
+      "source": "app/utils/user-validation.js",
+      "output": "docs/generated/backend/app/utils/user-validation.js.md",
+      "sourceSha256": "3b9aa9b3e24eefefaef224c46f9c10861fa417d361f573ed4d3e27b384be5a83",
+      "documentationSha256": "97a3100461bcd276d2686277e6328cb10d4c3cce3a8c87b19cc1f41fe51c3cbd"
+    },
+    {
+      "scope": "client",
+      "source": "client/src/api/auth.js",
+      "output": "docs/generated/client/api/auth.js.md",
+      "sourceSha256": "bfd19192db50cffbee7d5dae5159dc555e9e85623302fb61203429785ef384db",
+      "documentationSha256": "03d68a34d62f4976ede71f7b5c92a97821806fcadd2609840334b816284ae784"
+    },
+    {
+      "scope": "client",
+      "source": "client/src/api/axiosClient.js",
+      "output": "docs/generated/client/api/axiosClient.js.md",
+      "sourceSha256": "42c73fbcaef6ff31f11144b6a1dccd708c4b6cf0199c11aaa7ca11b1a38ee098",
+      "documentationSha256": "367b5251189613303bf410b731bdb922974c7b0f70bf94cd2be84ef38d667b86"
+    },
+    {
+      "scope": "client",
+      "source": "client/src/api/tokenStore.js",
+      "output": "docs/generated/client/api/tokenStore.js.md",
+      "sourceSha256": "2d2b90c5b741e857f2da9167523a8f5061644466261668503a053387292233f6",
+      "documentationSha256": "9a19edebe090221f8bca90478b2acad4e40658292b8d1a4cf0e021305fb04f8b"
+    },
+    {
+      "scope": "client",
+      "source": "client/src/App.jsx",
+      "output": "docs/generated/client/App.jsx.md",
+      "sourceSha256": "cc94991e69d0010ab4141de68e6e8c93c489e888689714620a6e462ff60d833b",
+      "documentationSha256": "62ba87884d32e4ced03e31f7dc56ae9909292ca39d44c79c4e4e63db410b76bc"
+    },
+    {
+      "scope": "client",
+      "source": "client/src/components/AppHeader.jsx",
+      "output": "docs/generated/client/components/AppHeader.jsx.md",
+      "sourceSha256": "57432147a0c546263885cc3eb4ad94f648ff5ed142c4db37d185e1780a9dab6f",
+      "documentationSha256": "330402c3c04ab34a28b52627598be25252852098fa2c7b6afb4462ffa9b928d3"
+    },
+    {
+      "scope": "client",
+      "source": "client/src/components/AppSidebar.jsx",
+      "output": "docs/generated/client/components/AppSidebar.jsx.md",
+      "sourceSha256": "39e54a3f839a52430c521b64b7be7daa7f8f035e42a25e275bb8e69bfa993ffd",
+      "documentationSha256": "8b1abe2ed5d6183fd3afd90408b32ee934b5fda1521432c75d8938fe520fe739"
+    },
+    {
+      "scope": "client",
+      "source": "client/src/components/AuthForm.jsx",
+      "output": "docs/generated/client/components/AuthForm.jsx.md",
+      "sourceSha256": "66c8d6e5a2714419aa269fe8d80768b0ff564e223a957f783c0da6ab1961ba36",
+      "documentationSha256": "6cfca113dad70a459c712a5300c2beb8d5c5c885e1cda262d68e9a01baca81ac"
+    },
+    {
+      "scope": "client",
+      "source": "client/src/components/FlexTron.jsx",
+      "output": "docs/generated/client/components/FlexTron.jsx.md",
+      "sourceSha256": "c78f775c00e81c8b79af6872affc402a740e4b08df1cb46e5a7135fc8a6df7de",
+      "documentationSha256": "146d7bafa422927e09614edc06991d8d370260bba0e710c4e56f4546611a5a7d"
+    },
+    {
+      "scope": "client",
+      "source": "client/src/components/Icon.jsx",
+      "output": "docs/generated/client/components/Icon.jsx.md",
+      "sourceSha256": "01592ce0f83bce5156585cf3ba015a7224b12d23614a6064c7e2877827f66ea4",
+      "documentationSha256": "3b433febbbea1947722400b2aa6025c8e586a9c84a5631f6b981743d76818ea2"
+    },
+    {
+      "scope": "client",
+      "source": "client/src/components/NavBar.jsx",
+      "output": "docs/generated/client/components/NavBar.jsx.md",
+      "sourceSha256": "68f3c52b2e6b376832d714324ab153b8d7fe029a53efb95e2c768f3526095004",
+      "documentationSha256": "b8885ac5f68b336b5fa4c6cb05e479adfd337ee489c8e6322260d0bf03702da5"
+    },
+    {
+      "scope": "client",
+      "source": "client/src/components/ProtectedRoute.jsx",
+      "output": "docs/generated/client/components/ProtectedRoute.jsx.md",
+      "sourceSha256": "1f12aef0c84cb595984947361938221347ff4011aa1bc18f6d52d25063342c90",
+      "documentationSha256": "da16dc0c490bce0d745ec532aa19506dc3e49db40ada7d3a48b764a1f661bcb8"
+    },
+    {
+      "scope": "client",
+      "source": "client/src/components/TextCard.jsx",
+      "output": "docs/generated/client/components/TextCard.jsx.md",
+      "sourceSha256": "3ee20b0f1ff198a555ce14ec7b0d82d4e3cf6388aa725eebf7d5de5261172748",
+      "documentationSha256": "2338911f0105563fbfeb7b7009702416f811818c929a08f1a450d0d892e5a424"
+    },
+    {
+      "scope": "client",
+      "source": "client/src/context/ThemeContext.jsx",
+      "output": "docs/generated/client/context/ThemeContext.jsx.md",
+      "sourceSha256": "2977237cab607f713729ab5293e210e5f01d1ed390778c3a9b102350ae7d081e",
+      "documentationSha256": "9fd1cee1974f25e47eac5951f78e5021063914cd1320e5cc241349d417da8de3"
+    },
+    {
+      "scope": "client",
+      "source": "client/src/context/UserContext.jsx",
+      "output": "docs/generated/client/context/UserContext.jsx.md",
+      "sourceSha256": "7c8daaf1e1ad177874642f352d2ef906c386aba4089cca01dfc53d49508b609d",
+      "documentationSha256": "67edfb226f46ae5965d64989c00c485cf903d49fc26393609f9685689bf76428"
+    },
+    {
+      "scope": "client",
+      "source": "client/src/layouts/AuthLayout.jsx",
+      "output": "docs/generated/client/layouts/AuthLayout.jsx.md",
+      "sourceSha256": "cd3b4bcdd91d1833507ad577f765f4b547b8a55e6f64c1096efd406a2d77ba64",
+      "documentationSha256": "679a11198d6c0d1adf3d1b3630979182f18b385c858919790eb26b159320b5c1"
+    },
+    {
+      "scope": "client",
+      "source": "client/src/layouts/DashboardLayout.jsx",
+      "output": "docs/generated/client/layouts/DashboardLayout.jsx.md",
+      "sourceSha256": "7124fac624c9ac288a467793540482c6c7d7c03d683f54f30c9d7f1212a5c1ca",
+      "documentationSha256": "1e1ab58caafbdf7f38ebccd5d45f20df5607d6727192dac2274da1a9afde96e6"
+    },
+    {
+      "scope": "client",
+      "source": "client/src/main.jsx",
+      "output": "docs/generated/client/main.jsx.md",
+      "sourceSha256": "bd0f6581d3119a9e1f9c6b976036aff94f6033db79be6f592bcd33ee506be7a1",
+      "documentationSha256": "3cb203d4cd98a60b702f317410b5ee6f78f722ab88c5dac03273169cb41b590f"
+    },
+    {
+      "scope": "client",
+      "source": "client/src/pages/Dashboard.jsx",
+      "output": "docs/generated/client/pages/Dashboard.jsx.md",
+      "sourceSha256": "9a658070f678fe05afc47a85a26c47a3f4fbefc7a2528be78613b8187ef49c2c",
+      "documentationSha256": "bd04dd94fd4f9f9939bacc7ecbd821f34a17cf57418e78301a7b637e66ee27d2"
+    },
+    {
+      "scope": "client",
+      "source": "client/src/pages/Home.jsx",
+      "output": "docs/generated/client/pages/Home.jsx.md",
+      "sourceSha256": "a08e58381c64a2fb208ec3c34bb42b26a63f64e6f95e31324fd91d9446cc57b8",
+      "documentationSha256": "a25d53c5b2c54e6a715cde5c43d99f28d5e41043d7f3f17d01fada0f94625a63"
+    },
+    {
+      "scope": "client",
+      "source": "client/src/pages/Login.jsx",
+      "output": "docs/generated/client/pages/Login.jsx.md",
+      "sourceSha256": "a9346f5efcd9e618bd7fee793fffe3d3908f4902de82cd3776235531d99a5c99",
+      "documentationSha256": "7bc6302a4926404dc4063e38f32981d15b9c0251164fcc906deaaa3777f4bd0a"
+    },
+    {
+      "scope": "client",
+      "source": "client/src/pages/Profile.jsx",
+      "output": "docs/generated/client/pages/Profile.jsx.md",
+      "sourceSha256": "3801b814e17e18011a32f49a84e1c591deef665803ca49693fa8652d03556569",
+      "documentationSha256": "6a8a14998bf734de95ee8f8dc115ad098fd5bfd8bb78ec1ff6f36708e99457a9"
+    },
+    {
+      "scope": "client",
+      "source": "client/src/pages/Register.jsx",
+      "output": "docs/generated/client/pages/Register.jsx.md",
+      "sourceSha256": "0d15f10c1cd8e26dc808b17eab65cf0b00c94282891ca6029cbb3216d04e2bb0",
+      "documentationSha256": "ca2e393f0b1fefddeb792d3ee9b1aefff85c3c789e522cfa96d7ccc181b3344c"
+    },
+    {
+      "scope": "client",
+      "source": "client/src/pages/Settings.jsx",
+      "output": "docs/generated/client/pages/Settings.jsx.md",
+      "sourceSha256": "9ccc783624b533f5cf931a14fd267b9ccc58acc8654b3ba96c9e53ad22f3d51a",
+      "documentationSha256": "1847e6a468df9b84eac4ef0962c7c7d791e17480e7ced24385f1fba1c5886e1d"
+    },
+    {
+      "scope": "backend",
+      "source": "server.js",
+      "output": "docs/generated/backend/server.js.md",
+      "sourceSha256": "6ffa08138cdcf1212dd807358dea7f3edc5c914381f9fc9396dccff64c4a8beb",
+      "documentationSha256": "53ae8c8043014e915d2f5436568b68c2fd4affe0a1a63dbab7f13a65b3e0a9f0"
+    }
+  ]
+}

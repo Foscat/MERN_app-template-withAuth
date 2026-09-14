@@ -1,16 +1,36 @@
-# React + Vite
+# MERN Forge Client
 
-This template provides a minimal setup to get React working in Vite with HMR and some ESLint rules.
+React 18 and Vite frontend for the authenticated MERN starter.
 
-Currently, two official plugins are available:
+## Semantic UI contract
 
-- [@vitejs/plugin-react](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react) uses [Babel](https://babeljs.io/) (or [oxc](https://oxc.rs) when used in [rolldown-vite](https://vite.dev/guide/rolldown)) for Fast Refresh
-- [@vitejs/plugin-react-swc](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react-swc) uses [SWC](https://swc.rs/) for Fast Refresh
+The client intentionally separates styling responsibilities:
 
-## React Compiler
+- `layout-style-css@3.2.0` owns responsive structure and page composition.
+- `ui-style-kit-css@2.4.0` owns Bento UI visual paint with the `service-blue-red` theme.
+- `interactive-surface-css@1.7.0` owns hover, focus, pressed, selected, busy, feedback, and disabled states.
+- `src/index.css` contains only application-specific composition and content constraints.
 
-The React Compiler is not enabled on this template because of its impact on dev & build performances. To add it, see [this documentation](https://react.dev/learn/react-compiler/installation).
+The canonical stylesheet order in `src/main.jsx` is:
 
-## Expanding the ESLint configuration
+```js
+import "ui-style-kit-css/visual/bento.css";
+import "ui-style-kit-css/interactive-surface-theme.css";
+import "interactive-surface-css/state-core.css";
+import "layout-style-css";
+import "./index.css";
+```
 
-If you are developing a production application, we recommend using TypeScript with type-aware lint rules enabled. Check out the [TS template](https://github.com/vitejs/vite/tree/main/packages/create-vite/template-react-ts) for information on how to integrate TypeScript and [`typescript-eslint`](https://typescript-eslint.io) in your project.
+The document uses `data-ui="bento"`, `data-theme="service-blue-red"`, `data-mode="dark"`, and `data-ly-layout="bento"`. Users may switch display mode from the authenticated workspace; dark remains the default.
+
+## Commands
+
+```bash
+npm run dev
+npm run build
+npm run test:unit
+npm run lint
+npm run format:check
+```
+
+Run browser snapshot verification only after focused checks and the production build pass.

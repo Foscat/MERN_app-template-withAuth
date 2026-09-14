@@ -1,20 +1,19 @@
 /**
  * @module components.TextCard
- * @description Presentational card component for title and body text content.
+ * @description Presentational Bento card for title and body content.
  */
-import { Panel, FlexboxGrid } from "rsuite";
 
 /**
- * @function TextCard
- * @description A reusable card component for displaying text content with optional title, subtitle, and icon. Utilizes rsuite's Panel and FlexboxGrid components for layout and styling.
- * @param {Object} param0 - The props object.
- * @param {string} param0.title - The title of the card.
- * @param {string} param0.subtitle - The subtitle of the card.
- * @param {React.ReactNode} param0.children - The content of the card.
- * @param {React.ReactNode} param0.icon - The icon to display in the card.
- * @param {number} param0.width - The width of the card.
- * @param {boolean} param0.center - Whether to center the card.
- * @returns {JSX.Element} - The rendered card component.
+ * Render a reusable semantic card.
+ *
+ * @param {Object} props - Card properties.
+ * @param {string} [props.title] - Card heading.
+ * @param {string} [props.subtitle] - Supporting copy.
+ * @param {React.ReactNode} props.children - Card body.
+ * @param {React.ReactNode} [props.icon] - Decorative or labeled icon content.
+ * @param {number|string} [props.width=320] - Preferred maximum width.
+ * @param {boolean} [props.center=true] - Center the card in its parent.
+ * @returns {JSX.Element} Semantic card.
  */
 export default function TextCard({
   title,
@@ -24,31 +23,17 @@ export default function TextCard({
   width = 320,
   center = true,
 }) {
+  const maxWidth = typeof width === "number" ? `${width}px` : width;
+
   return (
-    <FlexboxGrid justify={center ? "center" : "start"} style={{ marginBottom: 20 }}>
-      <FlexboxGrid.Item colspan="auto">
-        <Panel
-          bordered
-          shaded
-          style={{
-            width,
-            padding: 20,
-            borderRadius: 12,
-          }}
-        >
-          {icon && <div style={{ fontSize: 36, marginBottom: 12 }}>{icon}</div>}
-
-          {title && (
-            <h3 style={{ margin: "0 0 8px 0", fontWeight: 600 }}>{title}</h3>
-          )}
-
-          {subtitle && (
-            <p style={{ margin: "0 0 12px 0", opacity: 0.7 }}>{subtitle}</p>
-          )}
-
-          <div>{children}</div>
-        </Panel>
-      </FlexboxGrid.Item>
-    </FlexboxGrid>
+    <article
+      className={`ui-card bento-panel ly-stack app-card${center ? " app-card--center" : ""}`}
+      style={{ "--app-card-max": maxWidth }}
+    >
+      {icon ? <div className="app-card__icon">{icon}</div> : null}
+      {title ? <h2>{title}</h2> : null}
+      {subtitle ? <p className="app-muted">{subtitle}</p> : null}
+      <div className="ly-stack app-card__body">{children}</div>
+    </article>
   );
 }

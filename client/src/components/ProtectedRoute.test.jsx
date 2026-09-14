@@ -27,7 +27,7 @@ function renderProtectedRoute(props = {}) {
           }
         />
       </Routes>
-    </MemoryRouter>
+    </MemoryRouter>,
   );
 }
 

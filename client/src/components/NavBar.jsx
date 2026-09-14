@@ -1,50 +1,75 @@
 /**
  * @module components.NavBar
- * @description Reusable UI component module.
+ * @description Primary application navigation rendered with semantic UI hooks.
  */
-import { Navbar, Nav } from "rsuite";
-import { Link, useNavigate } from "react-router-dom";
+
+import { Link, NavLink } from "react-router-dom";
+import Icon from "./Icon";
+import { useUser } from "../context/UserContext";
 
 /**
- * @component NavBar
- * @description A navigation bar component that displays links to home, dashboard, and login/logout based on the user's authentication state. Utilizes rsuite's Navbar and Nav components for layout and styling. The logout functionality clears the JWT token from localStorage and redirects to the login page.
- * @returns {JSX.Element} - The rendered navigation bar component with links to home, dashboard, login/logout based on authentication state. Utilizes rsuite's Navbar and Nav components for layout and styling.
+ * Render the global navigation with authentication-aware actions.
+ *
+ * @returns {JSX.Element} Primary application navigation.
  */
 export default function NavBar() {
-  const token = localStorage.getItem("token");
-  const navigate = useNavigate();
-
-  const handleLogout = () => {
-    localStorage.removeItem("token");
-    navigate("/login");
-  };
+  const { user, logout } = useUser();
 
   return (
-    <Navbar appearance="subtle">
-      <Navbar.Brand as={Link} to="/">
-        MERN Template
-      </Navbar.Brand>
+    <header className="app-global-header ui-toolbar" data-ly-area="header">
+      <div className="ly-wrapper ly-wrapper--workspace ly-cluster app-global-header__inner">
+        <Link className="app-brand interactive-surface variant-subtle" to="/">
+          <span className="bento-brand-mark" aria-hidden="true">
+            M
+          </span>
+          <span>
+            <strong>MERN Forge</strong>
+            <small>Secure starter workspace</small>
+          </span>
+        </Link>
 
-      <Nav>
-        <Nav.Item as={Link} to="/">
-          Home
-        </Nav.Item>
-        {token && (
-          <Nav.Item as={Link} to="/dashboard">
-            Dashboard
-          </Nav.Item>
-        )}
-      </Nav>
+        <nav
+          className="ui-nav ly-cluster app-primary-nav"
+          aria-label="Primary navigation"
+        >
+          <NavLink
+            className="ui-nav-link interactive-surface variant-subtle"
+            to="/"
+            end
+          >
+            Home
+          </NavLink>
+          {user ? (
+            <NavLink
+              className="ui-nav-link interactive-surface variant-subtle"
+              to="/dashboard"
+            >
+              Dashboard
+            </NavLink>
+          ) : null}
+        </nav>
 
-      <Nav pullRight>
-        {!token ? (
-          <Nav.Item as={Link} to="/login">
-            Login
-          </Nav.Item>
-        ) : (
-          <Nav.Item onClick={handleLogout}>Logout</Nav.Item>
-        )}
-      </Nav>
-    </Navbar>
+        <div className="ly-cluster app-nav-actions">
+          {user ? (
+            <button
+              className="ui-button interactive-surface variant-subtle"
+              type="button"
+              onClick={logout}
+            >
+              <Icon name="logout" size={18} />
+              Log out
+            </button>
+          ) : (
+            <Link
+              className="ui-button interactive-surface variant-primary"
+              data-ui-variant="primary"
+              to="/login"
+            >
+              Log in
+            </Link>
+          )}
+        </div>
+      </div>
+    </header>
   );
 }

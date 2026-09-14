@@ -6,12 +6,22 @@
 const bcrypt = require("bcrypt");
 
 /**
- * Hash plain text input using bcrypt.
+ * Read a bounded bcrypt work factor from runtime configuration.
+ *
+ * @returns {number} Cost factor between 10 and 15.
+ */
+function getBcryptRounds() {
+  const parsed = Number.parseInt(process.env.BCRYPT_ROUNDS, 10);
+  return Number.isInteger(parsed) ? Math.min(Math.max(parsed, 10), 15) : 12;
+}
+
+/**
+ * Hash plain text input asynchronously using bcrypt.
  * @param {string} input - Plain text password.
- * @returns {string} Bcrypt hash.
+ * @returns {Promise<string>} Bcrypt hash.
  */
 function hashThis(input) {
-  return bcrypt.hashSync(input, process.env.salt);
+  return bcrypt.hash(input, getBcryptRounds());
 }
 
 /**
@@ -24,4 +34,4 @@ function compareHash(plainTxt, hash) {
   return bcrypt.compare(plainTxt, hash);
 }
 
-module.exports = { hashThis, compareHash };
+module.exports = { compareHash, getBcryptRounds, hashThis };

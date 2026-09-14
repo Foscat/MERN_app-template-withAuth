@@ -1,57 +1,85 @@
 /**
  * @module context.ThemeContext
- * @description React context provider and hook for theme selection and toggling.
- */
-/**
- * @file ThemeContext.jsx
- * @description Provides a context for managing the application's theme (light/dark).
- * It allows components to access and toggle the current theme, and persists the theme choice in localStorage.
+ * @description Persists the UI Style Kit color mode and exposes mode controls.
  */
 
-import { createContext, useContext, useEffect, useState } from "react";
+import {
+  createContext,
+  useCallback,
+  useContext,
+  useEffect,
+  useMemo,
+  useState,
+} from "react";
 
-const ThemeContext = createContext();
+const DEFAULT_MODE = "dark";
+const STORAGE_KEY = "ui-mode";
+const ThemeContext = createContext(null);
 
 /**
- * @function ThemeProvider
- * @description Provides a context provider for managing the application's theme (light/dark). It allows components to access and toggle the current theme, and persists the theme choice in localStorage.
- * @param {Object} param0 - The props object.
- * @param {React.ReactNode} param0.children - The child components to render within the provider.
- * @returns {JSX.Element} - The rendered provider component.
+ * @typedef {Object} ThemeContextValue
+ * @property {"light"|"dark"} mode - Active UI color mode.
+ * @property {"light"|"dark"} theme - Backward-compatible alias for `mode`.
+ * @property {Function} toggleMode - Toggle between light and dark modes.
+ * @property {Function} toggleTheme - Backward-compatible alias for `toggleMode`.
+ */
+
+/**
+ * Provide the Bento UI mode state to the client application.
+ *
+ * @param {{children: React.ReactNode}} props - Provider properties.
+ * @returns {JSX.Element} Theme context provider.
  */
 function ThemeProvider({ children }) {
-  const [theme, setTheme] = useState(() => {
-    return localStorage.getItem("theme") || "light";
+  const [mode, setMode] = useState(() => {
+    const storedMode = window.localStorage.getItem(STORAGE_KEY);
+    return storedMode === "light" || storedMode === "dark"
+      ? storedMode
+      : DEFAULT_MODE;
   });
 
   useEffect(() => {
-    localStorage.setItem("theme", theme);
-  }, [theme]);
+    window.localStorage.setItem(STORAGE_KEY, mode);
+    document.body.dataset.ui = "bento";
+    document.body.dataset.theme = "service-blue-red";
+    document.body.dataset.mode = mode;
+    document.body.dataset.lyLayout = "bento";
+    document.body.classList.add("ly-root");
+    document.documentElement.dataset.ui = "bento";
+    document.documentElement.dataset.theme = "service-blue-red";
+    document.documentElement.dataset.mode = mode;
+  }, [mode]);
 
-  const toggleTheme = () => {
-    setTheme((t) => (t === "light" ? "dark" : "light"));
-  };
+  const toggleMode = useCallback(() => {
+    setMode((currentMode) => (currentMode === "dark" ? "light" : "dark"));
+  }, []);
+
+  const value = useMemo(
+    () => ({ mode, theme: mode, toggleMode, toggleTheme: toggleMode }),
+    [mode, toggleMode],
+  );
 
   return (
-    <ThemeContext.Provider value={{ theme, toggleTheme }}>
-      {children}
-    </ThemeContext.Provider>
+    <ThemeContext.Provider value={value}>{children}</ThemeContext.Provider>
   );
 }
 
-
 /**
- * @function UseTheme
- * @description A custom hook that provides access to the theme context. It allows components to access the current theme and toggle the theme. It also ensures that the hook is used within a ThemeProvider.
- * @returns {Object} - The current theme and a function to toggle the theme.
- * @throws {Error} - If the hook is used outside of a ThemeProvider.
+ * Read the current color mode and mode actions.
+ *
+ * @returns {ThemeContextValue} Theme context value.
+ * @throws {Error} When called outside `ThemeProvider`.
  */
-const UseTheme = () => {
+function useTheme() {
   const themeContext = useContext(ThemeContext);
+
   if (!themeContext) {
-    throw new Error("UseTheme must be used within a ThemeProvider");
+    throw new Error("useTheme must be used within a ThemeProvider");
   }
+
   return themeContext;
 }
 
-export { ThemeProvider, UseTheme };
+const UseTheme = useTheme;
+
+export { ThemeProvider, UseTheme, useTheme };

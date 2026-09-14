@@ -6,26 +6,26 @@ import { Navigate } from "react-router-dom";
 import { useUser } from "../context/UserContext";
 
 /**
- * @function ProtectedRoute
- * @description A higher-order component that protects routes based on user authentication and roles. Redirects to login if not authenticated and to dashboard if the user role is not allowed.
- * @param {Object} param0 - The props object.
- * @param {React.ReactNode} param0.children - The child components to render if access is allowed.
- * @param {Array<string>} param0.allowedRoles - The array of roles allowed to access the route.
- * @returns {JSX.Element} - The rendered component or a redirect.
+ * Render protected content or redirect to the appropriate safe route.
+ *
+ * @param {Object} props - Route guard properties.
+ * @param {React.ReactNode} props.children - Content rendered for authorized users.
+ * @param {string[]} [props.allowedRoles] - Roles allowed to access the route.
+ * @returns {JSX.Element|null} Protected content, redirect, or an empty loading state.
  */
 export default function ProtectedRoute({ children, allowedRoles }) {
   const { user, loading } = useUser();
 
-  if (loading) return null;
+  if (loading) {
+    return null;
+  }
 
   if (!user) {
     return <Navigate to="/login" replace />;
   }
 
-  if (allowedRoles && allowedRoles.length > 0) {
-    if (!allowedRoles.includes(user.role)) {
-      return <Navigate to="/dashboard" replace />;
-    }
+  if (allowedRoles?.length && !allowedRoles.includes(user.role)) {
+    return <Navigate to="/dashboard" replace />;
   }
 
   return children;

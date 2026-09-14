@@ -5,22 +5,52 @@
 
 const jwt = require("jsonwebtoken");
 
+const TOKEN_ALGORITHM = "HS256";
+
+/**
+ * Build strict verification options shared by access-token checks.
+ *
+ * @returns {{algorithms: string[], audience: string, issuer: string}} JWT verification options.
+ */
+function getVerificationOptions() {
+  return {
+    algorithms: [TOKEN_ALGORITHM],
+    audience: process.env.JWT_AUDIENCE || "mern-app-client",
+    issuer: process.env.JWT_ISSUER || "mern-app-template",
+  };
+}
+
+/**
+ * @typedef {Object} TokenClaims
+ * @property {string} id - User identifier.
+ * @property {string} email - User email address.
+ * @property {string} role - Authorization role.
+ */
+
 /**
  * @typedef {Object} AuthenticatedRequest
- * @property {Object} [user] - Authenticated token payload.
- * @property {string} [user.id] - User id.
- * @property {string} [user.email] - User email.
- * @property {string} [user.role] - User role.
+ * @property {Object} headers - Request headers.
+ * @property {TokenClaims} [user] - Verified access-token claims.
+ */
+
+/**
+ * @typedef {Object} ExpressResponse
+ */
+
+/**
+ * @callback NextFunction
+ * @returns {void}
  */
 
 /**
  * Verify a bearer access token and attach decoded claims to `req.user`.
  * @param {AuthenticatedRequest} req - Express request.
- * @param {Object} res - Express response.
- * @param {Function} next - Next middleware callback.
+ * @param {ExpressResponse} res - Express response.
+ * @param {NextFunction} next - Next middleware callback.
  * @returns {void}
  */
 const requireAuth = (req, res, next) => {
+  // console.log("requireAuth middleware called", { path: req.path });
   const header = req.headers.authorization || "";
   const token = header.startsWith("Bearer ") ? header.slice(7) : null;
 
@@ -30,10 +60,19 @@ const requireAuth = (req, res, next) => {
   }
 
   try {
-    const decoded = jwt.verify(token, process.env.JWT_ACCESS_SECRET);
+    const decoded = jwt.verify(
+      token,
+      process.env.JWT_ACCESS_SECRET,
+      getVerificationOptions(),
+    );
+    if (typeof decoded === "string" || decoded.type !== "access") {
+      throw new Error("Invalid access token type");
+    }
     req.user = decoded;
+    // console.log("requireAuth middleware authorized", { userId: decoded.id });
     next();
-  } catch (error) {
+  } catch {
+    // console.log("requireAuth middleware rejected token", { path: req.path });
     res.status(401).json({ message: "Invalid or expired token" });
   }
 };
@@ -43,18 +82,49 @@ const requireAuth = (req, res, next) => {
  * @param {...string} roles - Allowed role names.
  * @returns {Function} Role-check middleware.
  */
-const requireRole = (...roles) => (req, res, next) => {
-  if (!req.user) {
-    res.status(401).json({ message: "Not authenticated" });
-    return;
-  }
+const requireRole =
+  (...roles) =>
+  (req, res, next) => {
+    // console.log("requireRole middleware called", { allowedRoles: roles });
+    if (!req.user) {
+      res.status(401).json({ message: "Not authenticated" });
+      return;
+    }
 
-  if (!roles.includes(req.user.role)) {
-    res.status(403).json({ message: "Forbidden" });
-    return;
-  }
+    if (!roles.includes(req.user.role)) {
+      res.status(403).json({ message: "Forbidden" });
+      return;
+    }
 
-  next();
-};
+    // console.log("requireRole middleware authorized", { userId: req.user.id });
+    next();
+  };
 
-module.exports = { requireAuth, requireRole };
+/**
+ * Allow access to a matching user resource or to an elevated role.
+ *
+ * @param {...string} roles - Roles permitted to access any user resource.
+ * @returns {Function} Owner-or-role authorization middleware.
+ */
+const requireSelfOrRole =
+  (...roles) =>
+  (req, res, next) => {
+    // console.log("requireSelfOrRole middleware called", { resourceId: req.params.id });
+    if (!req.user) {
+      res.status(401).json({ message: "Not authenticated" });
+      return;
+    }
+
+    const isOwner = String(req.user.id) === String(req.params.id);
+    const hasElevatedRole = roles.includes(req.user.role);
+
+    if (!isOwner && !hasElevatedRole) {
+      res.status(403).json({ message: "Forbidden" });
+      return;
+    }
+
+    // console.log("requireSelfOrRole middleware authorized", { userId: req.user.id });
+    next();
+  };
+
+module.exports = { requireAuth, requireRole, requireSelfOrRole };

@@ -1,98 +1,122 @@
 /**
- * @module client/src/context/UserContext
- * @description React authentication context backed by the JWT stored in localStorage.
+ * @module context.UserContext
+ * @description React authentication context backed by memory and a protected refresh cookie.
  */
 
-import { createContext, useContext, useEffect, useState } from "react";
-import jwtDecode from "jwt-decode";
+import {
+  createContext,
+  useCallback,
+  useContext,
+  useEffect,
+  useMemo,
+  useRef,
+  useState,
+} from "react";
 import api from "../api/axiosClient";
+import { clearAccessToken, setAccessToken } from "../api/tokenStore";
 
 const UserContext = createContext(null);
 
 /**
- * Decode a JWT and return its payload.
- * @param {string} token - JWT string.
- * @returns {object|null} Decoded token payload or `null` for invalid tokens.
- */
-const decodeToken = (token) => {
-  try {
-    return jwtDecode(token);
-  } catch {
-    return null;
-  }
-};
-
-/**
- * Provide user auth state and actions.
- * @param {{ children: * }} props - Provider props.
- * @returns {JSX.Element}
+ * Provide refresh-cookie session restoration and user auth actions.
+ *
+ * @param {{children: React.ReactNode}} props - Provider props.
+ * @returns {JSX.Element} Authentication context provider.
  */
 function UserProvider({ children }) {
   const [user, setUser] = useState(null);
   const [loading, setLoading] = useState(true);
-
-  useEffect(() => {
-    const token = localStorage.getItem("token");
-
-    if (!token) {
-      setUser(null);
-      setLoading(false);
-      return;
-    }
-
-    const decoded = decodeToken(token);
-    if (!decoded) {
-      localStorage.removeItem("token");
-      setUser(null);
-      setLoading(false);
-      return;
-    }
-
-    setUser(decoded);
-    setLoading(false);
-  }, []);
+  const restorationStarted = useRef(false);
 
   /**
-   * Log out and clear both local token and refresh cookie.
+   * Apply a successful authentication response to memory.
+   *
+   * @param {{token: string, user: Object}} session - API session payload.
+   * @returns {void}
+   */
+  const establishSession = useCallback((session) => {
+    setAccessToken(session.token);
+    setUser(session.user);
+  }, []);
+
+  /** Clear in-memory authentication state. @returns {void} */
+  const clearSession = useCallback(() => {
+    clearAccessToken();
+    setUser(null);
+  }, []);
+
+  useEffect(() => {
+    if (restorationStarted.current) {
+      return undefined;
+    }
+    restorationStarted.current = true;
+
+    /**
+     * Restore the browser session from its HTTP-only cookie.
+     *
+     * @returns {Promise<void>}
+     */
+    async function restoreSession() {
+      try {
+        // console.log("restore session API call", { endpoint: "/users/refresh" });
+        const response = await api.post("/users/refresh");
+        establishSession(response.data);
+        // console.log("restore session API return", { authenticated: true });
+      } catch {
+        clearSession();
+      } finally {
+        setLoading(false);
+      }
+    }
+
+    void restoreSession();
+    return undefined;
+  }, [clearSession, establishSession]);
+
+  useEffect(() => {
+    const handleSessionExpired = () => clearSession();
+    window.addEventListener("auth:session-expired", handleSessionExpired);
+    return () => {
+      window.removeEventListener("auth:session-expired", handleSessionExpired);
+    };
+  }, [clearSession]);
+
+  /**
+   * Revoke the refresh session and clear local authentication state.
+   *
    * @returns {Promise<void>}
    */
-  const logout = async () => {
+  const logout = useCallback(async () => {
     try {
+      // console.log("logout API call", { endpoint: "/users/logout" });
       await api.post("/users/logout");
-    } catch (error) {
-      console.error("Logout failed", error);
+      // console.log("logout API return", { loggedOut: true });
     } finally {
-      localStorage.removeItem("token");
-      setUser(null);
-      window.location.href = "/login";
+      clearSession();
     }
-  };
+  }, [clearSession]);
 
-  const value = {
-    user,
-    loading,
-    setUser,
-    logout,
-    decodeToken,
-  };
+  const value = useMemo(
+    () => ({ clearSession, establishSession, loading, logout, user }),
+    [clearSession, establishSession, loading, logout, user],
+  );
 
   return <UserContext.Provider value={value}>{children}</UserContext.Provider>;
 }
 
 /**
  * Consume authentication context.
- * @returns {{ user: object|null, loading: boolean, setUser: Function, logout: Function, decodeToken: Function }} User context value.
+ *
+ * @returns {{clearSession: Function, establishSession: Function, user: Object|null, loading: boolean, logout: Function}} User context value.
  * @throws {Error} When called outside `UserProvider`.
  */
-const useUser = () => {
+function useUser() {
   const userContext = useContext(UserContext);
-
   if (!userContext) {
     throw new Error("useUser must be used within a UserProvider");
   }
-
   return userContext;
-};
+}
 
 const UseUser = useUser;
 

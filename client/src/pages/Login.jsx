@@ -8,11 +8,15 @@ import AuthLayout from "../layouts/AuthLayout";
 import AuthForm from "../components/AuthForm";
 import { loginUser } from "../api/auth";
 import { useUser } from "../context/UserContext";
-import jwtDecode from "jwt-decode";
 
+/**
+ * Render login state and establish an authenticated client session.
+ *
+ * @returns {JSX.Element} Login route.
+ */
 export default function Login() {
   const navigate = useNavigate();
-  const { setUser } = useUser();
+  const { establishSession } = useUser();
 
   const [formValue, setFormValue] = useState({
     email: "",
@@ -21,16 +25,19 @@ export default function Login() {
 
   const [error, setError] = useState("");
 
+  /**
+   * Authenticate the submitted credentials and enter the dashboard.
+   *
+   * @returns {Promise<void>}
+   */
   const handleSubmit = async () => {
     setError("");
 
     try {
       const data = await loginUser(formValue);
-      localStorage.setItem("token", data.token);
-      const decoded = jwtDecode(data.token);
-      setUser(decoded);
+      establishSession(data);
       navigate("/dashboard");
-    } catch (err) {
+    } catch {
       setError("Invalid credentials. Please try again.");
     }
   };
@@ -45,8 +52,8 @@ export default function Login() {
         error={error}
       />
 
-      <p style={{ marginTop: 16 }}>
-        Don't have an account? <Link to="/register">Register</Link>
+      <p className="app-auth-switch">
+        Don&apos;t have an account? <Link to="/register">Register</Link>
       </p>
     </AuthLayout>
   );

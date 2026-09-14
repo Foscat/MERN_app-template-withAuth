@@ -1,3 +1,8 @@
+/**
+ * @module client/playwright/pages/page.snapshots.spec
+ * @description Browser snapshots for the public semantic UI route surface.
+ */
+
 const { test, expect } = require("@playwright/test");
 
 const PAGES = [
