@@ -4,6 +4,9 @@
  */
 
 const assert = require("node:assert/strict");
+const fs = require("node:fs");
+const os = require("node:os");
+const path = require("node:path");
 const { before, describe, it } = require("node:test");
 
 process.env.JWT_ACCESS_SECRET =
@@ -53,17 +56,55 @@ function createSharedTestStoreFactory(counters) {
   };
 }
 
+/**
+ * Create a temporary production client build fixture.
+ *
+ * @returns {{ root: string, cleanup: Function }} Fixture path and cleanup callback.
+ */
+function createClientDistFixture() {
+  const root = fs.mkdtempSync(path.join(os.tmpdir(), "mern-client-dist-"));
+  fs.mkdirSync(path.join(root, "assets"), { recursive: true });
+  fs.mkdirSync(path.join(root, "settings"), { recursive: true });
+  fs.writeFileSync(
+    path.join(root, "routes-manifest.json"),
+    JSON.stringify([{ path: "/settings", indexable: false }]),
+  );
+  fs.writeFileSync(
+    path.join(root, "settings", "index.html"),
+    "<!doctype html><title>Settings | MERN Forge</title>",
+  );
+  fs.writeFileSync(
+    path.join(root, "404.html"),
+    "<!doctype html><title>404</title>",
+  );
+
+  return {
+    root,
+    cleanup() {
+      fs.rmSync(root, { recursive: true, force: true });
+    },
+  };
+}
+
 describe("Express application security boundary", () => {
   it("serves real page and missing-asset status codes from the route manifest", async () => {
+    const fixture = createClientDistFixture();
     const production = createApp({
-      isProduction: true,
+      clientDistPath: fixture.root,
       enableRateLimit: false,
+      isProduction: true,
     });
-    await request(production).get("/missing-page").expect(404);
-    await request(production).get("/assets/missing.js").expect(404);
-    const privatePage = await request(production).get("/settings").expect(200);
-    assert.equal(privatePage.headers["x-robots-tag"], "noindex, follow");
-    assert.match(privatePage.text, /Settings \| MERN Forge/);
+    try {
+      await request(production).get("/missing-page").expect(404);
+      await request(production).get("/assets/missing.js").expect(404);
+      const privatePage = await request(production)
+        .get("/settings")
+        .expect(200);
+      assert.equal(privatePage.headers["x-robots-tag"], "noindex, follow");
+      assert.match(privatePage.text, /Settings \| MERN Forge/);
+    } finally {
+      fixture.cleanup();
+    }
   });
   it(
     "shares independent authentication sessions between HTTP instances",

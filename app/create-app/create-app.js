@@ -116,6 +116,7 @@ function errorHandler(error, req, res, next) {
  * @param {string[]} [options.clientOrigins] - Allowed browser origins.
  * @param {boolean} [options.enableRateLimit] - Whether to enforce API request quotas.
  * @param {boolean} [options.isProduction] - Whether to serve the compiled client.
+ * @param {string} [options.clientDistPath] - Compiled client directory to serve in production.
  * @param {function(string): (Object|undefined)} [options.rateLimitStoreFactory] - Optional shared-store factory.
  * @param {boolean|number|string} [options.trustProxy] - Express trust-proxy setting.
  * @returns {Object} Configured Express application.
@@ -125,6 +126,7 @@ function createApp({
   clientOrigins = parseClientOrigins(process.env.CLIENT_ORIGINS),
   enableRateLimit = process.env.NODE_ENV !== "test",
   isProduction = process.env.NODE_ENV === "production",
+  clientDistPath = path.join(__dirname, "..", "..", "client", "dist"),
   rateLimitStoreFactory,
   trustProxy = process.env.TRUST_PROXY || false,
   lifecycle = { draining: false },
@@ -227,9 +229,7 @@ function createApp({
     // console.log("API not-found handler called", { method: req.method, path: req.path });
     res.status(404).json({ message: "API route not found" });
   });
-
   if (isProduction) {
-    const clientDistPath = path.join(__dirname, "..", "..", "client", "dist");
     const routeManifest = JSON.parse(
       fs.readFileSync(
         path.join(clientDistPath, "routes-manifest.json"),
