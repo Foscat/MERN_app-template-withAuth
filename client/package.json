@@ -23,8 +23,8 @@
     "axios": "1.20.0",
     "interactive-surface-css": "1.7.0",
     "layout-style-css": "3.2.0",
-    "react": "18.3.1",
-    "react-dom": "18.3.1",
+    "react": "19.3.0",
+    "react-dom": "19.3.0",
     "react-router-dom": "7.18.3",
     "ui-style-kit-css": "2.4.0"
   },
